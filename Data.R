@@ -6,7 +6,9 @@ APR <- read_xlsx("All_APR.xlsx")
 
 summary(APR)
 
-APR <- APR %>% rename("Multi-Year APR" = `Multi-Year Rate`)
+APR <- APR %>% rename("Multi-Year APR" = `Multi-Year Rate`) %>%
+  filter(Sport == "Men's Soccer" | Sport == "Women's Soccer" | Sport == "Baseball" | Sport == "Softball" | Sport == "Men's Basketball" | Sport == "Women's Basketball" | 
+           Sport == "Football" | Sport == "Men's Ice Hockey" | Sport == "Women's Ice Hockey")
 
 GSR <- read_xlsx("All_GSR.xlsx")
 
