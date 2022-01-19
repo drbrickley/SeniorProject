@@ -85,3 +85,10 @@ glimpse(Records)
 
 unique(Records$Team)
 
+Crosswalk <- read_xlsx("Crosswalk.xlsx")
+
+Records <- Records %>% inner_join(Crosswalk, by = "Team")
+
+Full <- inner_join(Records, APR, by = c("School", "Sport", "Academic Year"))
+
+summary(Full)
