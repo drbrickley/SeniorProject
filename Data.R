@@ -91,4 +91,6 @@ Records <- Records %>% inner_join(Crosswalk, by = "Team")
 
 Full <- inner_join(Records, APR, by = c("School", "Sport", "Academic Year"))
 
+Full <- Full %>% distinct()
+
 summary(Full)
