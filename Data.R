@@ -95,4 +95,8 @@ Full <- Full %>% distinct()
 
 summary(Full)
 
+library(rscorecard)
+
+
+
 write.csv(Full,"C:\\Users\\stick\\Documents\\R\\SeniorProject\\Full_Data.csv", row.names = FALSE)
