@@ -1,0 +1,121 @@
+---
+title: "Analysis"
+author: "Derek Brickley"
+date: "1/26/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+library(MASS)
+library(gridExtra)  
+library(mnormt) 
+library(lme4) 
+library(knitr) 
+library(kableExtra)
+library(tidyverse)
+library(GGally)
+library(mice)
+library(nlme)
+library(boot)
+library(HLMdiag)
+library(pander)
+```
+
+```{r}
+sports <- read.csv("Full_Data.csv")
+```
+
+```{r}
+sports <- sports %>% select(-FBS.or.FCS)
+dim(sports)
+head(sports)
+summary(sports)
+```
+
+```{r}
+sports %>% count(School)
+sports %>% count(Academic.Year)
+```
+
+
+```{r}
+select <- dplyr::select
+keydata <- sports %>% 
+  dplyr::select(Rank, Team, W, L, T, 
+      Pct, Academic.Year, Sport, School, State, Multi.Year.APR, Penalties, Postseason)
+keydata
+# Create Level2 data set by picking off one observation 
+# per subject, which would be easier if every subject 
+# had a diary entry labeled '1' - should be 37 rows 
+# and 6 columns (one per L2 variable)
+school.lev2 <-  keydata %>%
+  group_by(School) %>%
+  filter(row_number() == 1) %>%
+  select(School, Academic.Year)
+
+year.lev2 <-  keydata %>%
+  group_by(Academic.Year) %>%
+  filter(row_number() == 1) %>%
+  select(School, Academic.Year)
+```
+
+```{r}
+meanbyschool <- sports %>% group_by(School) %>%
+  summarise(meanbyschool = mean(Multi.Year.APR, na.rm = TRUE))
+school.lev2 <- school.lev2 %>%
+  left_join(meanbyschool, by = "School")
+
+meanbyyear <- sports %>% group_by(Academic.Year) %>%
+  summarise(meanbyyear = mean(Multi.Year.APR, na.rm = TRUE))
+year.lev2 <- year.lev2 %>%
+  left_join(meanbyyear, by = "Academic.Year")
+```
+
+```{r}
+sports %>% count(Sport)
+```
+
+```{r}
+theme.1 <- theme(axis.title.x = element_text(size = 14),
+  axis.title.y = element_text(size = 14),
+  plot.title=element_text(hjust=.9,face="italic",size=12))
+## Histogram of negative affect frequencies
+apr.all <- ggplot(data=sports,aes(x=Multi.Year.APR)) + 
+  geom_histogram(binwidth = 20, fill = "white",color = "black") + 
+  theme.1 + xlim(400,1000) +
+  xlab("Multi Year APR Score") + ylab("Frequency") + labs(title="(a)") 
+
+apr.mean <- ggplot(data=school.lev2,aes(x=meanbyschool)) + 
+  geom_histogram(binwidth = 20, fill = "white", 
+                 color = "black") + 
+  theme.1 + xlim(800,1000) +
+  xlab("Mean APR Score by School") + ylab("Frequency") + labs(title="(b)") 
+
+year.apr.mean <- ggplot(data=year.lev2,aes(x=meanbyyear)) + 
+  geom_histogram(binwidth = 20, fill = "white", 
+                 color = "black") + 
+  theme.1 + xlim(800,1000) +
+  xlab("Mean APR Score by Year") + ylab("Frequency") + labs(title="(c)") 
+mli.hist1 <- grid.arrange(apr.all,apr.mean,year.apr.mean, ncol=1)
+```
+
+```{r}
+box.sport <- ggplot(data=sports,aes(factor(Sport),Multi.Year.APR)) +
+  geom_boxplot() + 
+  theme.1 + coord_flip() + ylab("Multi-Year APR") + 
+  xlab("") + labs(title="(a)")
+
+mli.boxscatmat1 <- grid.arrange(box.sport,ncol=1)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

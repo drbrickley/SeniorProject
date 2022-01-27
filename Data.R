@@ -94,3 +94,5 @@ Full <- inner_join(Records, APR, by = c("School", "Sport", "Academic Year"))
 Full <- Full %>% distinct()
 
 summary(Full)
+
+write.csv(Full,"C:\\Users\\stick\\Documents\\R\\SeniorProject\\Full_Data.csv", row.names = FALSE)
