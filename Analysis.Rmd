@@ -31,6 +31,10 @@ sports <- read.csv("Full_Data.csv")
 
 ```{r}
 sports <- sports %>% select(-FBS.or.FCS)
+###  %>%
+###  separate(Academic.Year, c("Start.Year", "End.Year")) %>%
+### mutate(Start.Year = as.numeric(Start.Year)) %>%
+###  mutate(End.Year = as.numeric(End.Year))
 dim(sports)
 head(sports)
 summary(sports)
@@ -113,7 +117,13 @@ mli.boxscatmat1 <- grid.arrange(box.sport,ncol=1)
 ```
 
 ```{r}
-
+options(warn = -1)
+ggplot(sports,aes(x=Academic.Year,y=Multi.Year.APR)) + 
+  geom_line(aes(group=School),color="dark grey") + 
+  geom_smooth(se=FALSE,color="black") + 
+  theme.1 + 
+  labs(x="Academic Year",y="APR Score")
+options(warn = -1)
 ```
 
 ```{r}
