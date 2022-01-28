@@ -24,6 +24,7 @@ library(boot)
 library(HLMdiag)
 library(pander)
 library(skimr)
+library(udpipe)
 ```
 
 ```{r}
@@ -35,6 +36,13 @@ sports <- sports %>% select(-FBS.or.FCS) %>%
   separate(Academic.Year, c("Start.Year", "End.Year")) %>%
   mutate(Start.Year = as.numeric(Start.Year)) %>%
   mutate(End.Year = as.numeric(End.Year))
+
+sports$program.id <- unique_identifier(sports, fields = c("School", "Sport"))
+head(sports, 15)
+range(sports$program.id)
+
+sports <- sports %>% mutate(Years10 = Start.Year - 2010)
+
 skim(sports)
 ```
 
@@ -47,7 +55,7 @@ sports %>% count(Start.Year)
 ```{r}
 select <- dplyr::select
 keydata <- sports %>% 
-  dplyr::select(Rank, W, L, T, 
+  dplyr::select(Rank, W, L, T, program.id
       Pct, Start.Year, Sport, School, State, Multi.Year.APR, Penalties, Postseason)
 keydata
 # Create Level2 data set by picking off one observation 
@@ -123,13 +131,11 @@ ggplot(sports,aes(x=Start.Year,y=Multi.Year.APR)) +
 
 ```{r}
 set.seed(1313)
-randteam = as.vector(sample(sports$School,size=25))
-randsport = as.vector(sample(sports$Sport,size=1))
+randteam = as.vector(sample(sports$program.id,size=25))
 sportsrd <- sports %>%
-  filter(School %in% randteam) %>%
-  filter(Sport %in% randsport)
+  filter(program.id %in% randteam)
 ggplot(sportsrd, aes(x=Start.Year, y=Multi.Year.APR)) + 
-  facet_wrap(~School+Sport,ncol=5) + 
+  facet_wrap(~program.id,ncol=5) + 
   geom_point() + 
   geom_smooth(method="lm") + 
   theme.1 +
@@ -138,7 +144,8 @@ ggplot(sportsrd, aes(x=Start.Year, y=Multi.Year.APR)) +
 ```
 
 ```{r}
-model1 <- lmer(Multi.Year.APR ~ 1 + (1|Sport) + (1|School), 
+### Unconditional Means Model
+model1 <- lmer(Multi.Year.APR ~ 1 + (1|program.id) + (1|School), 
                REML=T, data=sports)
 
 VCrandom <- VarCorr(model1)
@@ -148,4 +155,18 @@ cat(" Number of Level Two groups = ",
     "Number of Level Three groups = ",
     summary(model1)$ngrps[2])
 coef(summary(model1))
+```
+
+```{r}
+### Unconditional Growth Model
+model2 = lmer(Multi.Year.APR ~ Years10 + (Years10|program.id) + (Years10|School),
+               REML=T, data=sports)
+
+VCrandom <- VarCorr(model2)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(model2)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(model2)$ngrps[2])
+coef(summary(model2))
 ```
