@@ -123,8 +123,8 @@ ggplot(sports,aes(x=Start.Year,y=Multi.Year.APR)) +
 
 ```{r}
 set.seed(1313)
-randteam = as.vector(sample(sports$School,size=5))
-randsport = as.vector(sample(sports$Sport,size=5))
+randteam = as.vector(sample(sports$School,size=25))
+randsport = as.vector(sample(sports$Sport,size=1))
 sportsrd <- sports %>%
   filter(School %in% randteam) %>%
   filter(Sport %in% randsport)
@@ -135,4 +135,17 @@ ggplot(sportsrd, aes(x=Start.Year, y=Multi.Year.APR)) +
   theme.1 +
   theme(strip.text.x=element_blank()) + 
   labs(x="Academic Year",y="Multi-Year APR Score")
+```
+
+```{r}
+model1 <- lmer(Multi.Year.APR ~ 1 + (1|Sport) + (1|School), 
+               REML=T, data=sports)
+
+VCrandom <- VarCorr(model1)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(model1)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(model1)$ngrps[2])
+coef(summary(model1))
 ```
