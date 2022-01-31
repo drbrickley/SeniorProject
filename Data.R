@@ -97,6 +97,16 @@ summary(Full)
 
 library(rscorecard)
 
+Full <- Full %>% select(-`FBS or FCS`) %>%
+  separate(`Academic Year`, c("Start.Year", "End.Year")) %>%
+  mutate(Start.Year = as.numeric(Start.Year)) %>%
+  mutate(End.Year = as.numeric(End.Year))
 
+
+library(udpipe)
+
+Full$program.id <- unique_identifier(Full, fields = c("School", "Sport"))
+
+Full <- Full %>% mutate(Years10 = Start.Year - 2010)
 
 write.csv(Full,"C:\\Users\\stick\\Documents\\R\\SeniorProject\\Full_Data.csv", row.names = FALSE)

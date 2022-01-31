@@ -24,7 +24,6 @@ library(boot)
 library(HLMdiag)
 library(pander)
 library(skimr)
-library(udpipe)
 ```
 
 ```{r}
@@ -32,17 +31,8 @@ sports <- read.csv("Full_Data.csv")
 ```
 
 ```{r}
-sports <- sports %>% select(-FBS.or.FCS) %>%
-  separate(Academic.Year, c("Start.Year", "End.Year")) %>%
-  mutate(Start.Year = as.numeric(Start.Year)) %>%
-  mutate(End.Year = as.numeric(End.Year))
-
-sports$program.id <- unique_identifier(sports, fields = c("School", "Sport"))
 head(sports, 15)
 range(sports$program.id)
-
-sports <- sports %>% mutate(Years10 = Start.Year - 2010)
-
 skim(sports)
 ```
 
@@ -55,7 +45,7 @@ sports %>% count(Start.Year)
 ```{r}
 select <- dplyr::select
 keydata <- sports %>% 
-  dplyr::select(Rank, W, L, T, program.id
+  dplyr::select(Rank, W, L, T, program.id,
       Pct, Start.Year, Sport, School, State, Multi.Year.APR, Penalties, Postseason)
 keydata
 # Create Level2 data set by picking off one observation 
