@@ -216,3 +216,27 @@ cat(" Number of Level Two groups = ",
     summary(f_itmodel4)$ngrps[2])
 coef(summary(f_itmodel4))
 ```
+
+```{r}
+fullmodel = lmer(Pct ~ Multi.Year.APR + (1|School) + (1|program.id), REML=T, data=sports)
+
+VCrandom <- VarCorr(fullmodel)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(fullmodel)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(fullmodel)$ngrps[2])
+coef(summary(fullmodel))
+```
+
+```{r}
+fullmodel = lmer(Pct ~ Multi.Year.APR + (Multi.Year.APR|School) + (1|program.id), REML=T, data=sports)
+
+VCrandom <- VarCorr(fullmodel)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(fullmodel)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(fullmodel)$ngrps[2])
+coef(summary(fullmodel))
+```
