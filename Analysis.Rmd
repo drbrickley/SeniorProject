@@ -160,3 +160,59 @@ cat(" Number of Level Two groups = ",
     summary(model2)$ngrps[2])
 coef(summary(model2))
 ```
+
+```{r}
+### Send it Model 
+f_itmodel = lmer(Pct ~ Multi.Year.APR  + (Multi.Year.APR|program.id) + (Multi.Year.APR|School),
+               REML=T, data=sports)
+
+VCrandom <- VarCorr(f_itmodel)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(f_itmodel)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(f_itmodel)$ngrps[2])
+coef(summary(f_itmodel))
+```
+
+```{r}
+### Send it Model 
+f_itmodel2 = lmer(Pct ~ Multi.Year.APR + (Multi.Year.APR|program.id) + (Multi.Year.APR|School) + (Multi.Year.APR|Years10),
+               REML=T, data=sports)
+
+VCrandom <- VarCorr(f_itmodel2)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(f_itmodel2)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(f_itmodel2)$ngrps[2])
+coef(summary(f_itmodel2))
+```
+
+```{r}
+### Send it Model 
+f_itmodel3 = lmer(Pct ~ Multi.Year.APR + (Multi.Year.APR|program.id) + (1|School) + (0 + Multi.Year.APR|School) + (Multi.Year.APR|Years10),
+               REML=T, data=sports)
+
+VCrandom <- VarCorr(f_itmodel3)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(f_itmodel3)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(f_itmodel3)$ngrps[2])
+coef(summary(f_itmodel3))
+```
+
+```{r}
+### Send it Model 
+f_itmodel4 = lmer(Pct ~ Multi.Year.APR + (Multi.Year.APR|program.id) + (1|School) + (Multi.Year.APR|Years10),
+               REML=T, data=sports)
+
+VCrandom <- VarCorr(f_itmodel4)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(f_itmodel4)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(f_itmodel4)$ngrps[2])
+coef(summary(f_itmodel4))
+```
