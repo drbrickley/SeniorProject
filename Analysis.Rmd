@@ -133,92 +133,18 @@ ggplot(sportsrd, aes(x=Start.Year, y=Multi.Year.APR)) +
   labs(x="Academic Year",y="Multi-Year APR Score")
 ```
 
-```{r}
-### Unconditional Means Model
-model1 <- lmer(Multi.Year.APR ~ 1 + (1|program.id) + (1|School), 
-               REML=T, data=sports)
+$Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + \epsilon_i,_j,_k$
 
-VCrandom <- VarCorr(model1)
-print(VCrandom, comp = c("Variance", "Std.Dev."))
-cat(" Number of Level Two groups = ",
-    summary(model1)$ngrps[1], "\n", 
-    "Number of Level Three groups = ",
-    summary(model1)$ngrps[2])
-coef(summary(model1))
+```{r}
+OLSmodel = lm(Pct ~ centeredAPR, data = sports)
+
+OLSmodel
 ```
 
-```{r}
-### Unconditional Growth Model
-model2 = lmer(Multi.Year.APR ~ Years10 + (Years10|program.id) + (Years10|School),
-               REML=T, data=sports)
-
-VCrandom <- VarCorr(model2)
-print(VCrandom, comp = c("Variance", "Std.Dev."))
-cat(" Number of Level Two groups = ",
-    summary(model2)$ngrps[1], "\n", 
-    "Number of Level Three groups = ",
-    summary(model2)$ngrps[2])
-coef(summary(model2))
-```
+$Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + s_i + p_i,_j + \epsilon_i,_j,_k$
 
 ```{r}
-### Send it Model 
-f_itmodel = lmer(Pct ~ Multi.Year.APR  + (Multi.Year.APR|program.id) + (Multi.Year.APR|School),
-               REML=T, data=sports)
-
-VCrandom <- VarCorr(f_itmodel)
-print(VCrandom, comp = c("Variance", "Std.Dev."))
-cat(" Number of Level Two groups = ",
-    summary(f_itmodel)$ngrps[1], "\n", 
-    "Number of Level Three groups = ",
-    summary(f_itmodel)$ngrps[2])
-coef(summary(f_itmodel))
-```
-
-```{r}
-### Send it Model 
-f_itmodel2 = lmer(Pct ~ Multi.Year.APR + (Multi.Year.APR|program.id) + (Multi.Year.APR|School) + (Multi.Year.APR|Years10),
-               REML=T, data=sports)
-
-VCrandom <- VarCorr(f_itmodel2)
-print(VCrandom, comp = c("Variance", "Std.Dev."))
-cat(" Number of Level Two groups = ",
-    summary(f_itmodel2)$ngrps[1], "\n", 
-    "Number of Level Three groups = ",
-    summary(f_itmodel2)$ngrps[2])
-coef(summary(f_itmodel2))
-```
-
-```{r}
-### Send it Model 
-f_itmodel3 = lmer(Pct ~ Multi.Year.APR + (Multi.Year.APR|program.id) + (1|School) + (0 + Multi.Year.APR|School) + (Multi.Year.APR|Years10),
-               REML=T, data=sports)
-
-VCrandom <- VarCorr(f_itmodel3)
-print(VCrandom, comp = c("Variance", "Std.Dev."))
-cat(" Number of Level Two groups = ",
-    summary(f_itmodel3)$ngrps[1], "\n", 
-    "Number of Level Three groups = ",
-    summary(f_itmodel3)$ngrps[2])
-coef(summary(f_itmodel3))
-```
-
-```{r}
-### Send it Model 
-f_itmodel4 = lmer(Pct ~ Multi.Year.APR + (Multi.Year.APR|program.id) + (1|School) + (Multi.Year.APR|Years10),
-               REML=T, data=sports)
-
-VCrandom <- VarCorr(f_itmodel4)
-print(VCrandom, comp = c("Variance", "Std.Dev."))
-cat(" Number of Level Two groups = ",
-    summary(f_itmodel4)$ngrps[1], "\n", 
-    "Number of Level Three groups = ",
-    summary(f_itmodel4)$ngrps[2])
-coef(summary(f_itmodel4))
-```
-
-```{r}
-fullmodel = lmer(Pct ~ Multi.Year.APR + (1|School) + (1|program.id), REML=T, data=sports)
+fullmodel = lmer(Pct ~ centeredAPR + (1|School) + (1|program.id), REML=T, data=sports)
 
 VCrandom <- VarCorr(fullmodel)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -229,14 +155,31 @@ cat(" Number of Level Two groups = ",
 coef(summary(fullmodel))
 ```
 
-```{r}
-fullmodel = lmer(Pct ~ Multi.Year.APR + (Multi.Year.APR|School) + (1|program.id), REML=T, data=sports)
+$Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + s_i + m_iAPR + p_i,_j + \epsilon_i,_j,_k$
 
-VCrandom <- VarCorr(fullmodel)
+```{r}
+fullmodel2 = lmer(Pct ~ centeredAPR + (centeredAPR|School) + (1|program.id), REML=T, data=sports)
+
+VCrandom <- VarCorr(fullmodel2)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
 cat(" Number of Level Two groups = ",
-    summary(fullmodel)$ngrps[1], "\n", 
+    summary(fullmodel2)$ngrps[1], "\n", 
     "Number of Level Three groups = ",
-    summary(fullmodel)$ngrps[2])
-coef(summary(fullmodel))
+    summary(fullmodel2)$ngrps[2])
+coef(summary(fullmodel2))
 ```
+
+$Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + s_i + p_i,_j + m_iAPR + \epsilon_i,_j,_k$
+
+```{r}
+fullmodel3 = lmer(Pct ~ centeredAPR + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
+
+VCrandom <- VarCorr(fullmodel3)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(fullmodel3)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(fullmodel3)$ngrps[2])
+coef(summary(fullmodel3))
+```
+

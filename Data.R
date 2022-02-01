@@ -95,18 +95,18 @@ Full <- Full %>% distinct()
 
 summary(Full)
 
-library(rscorecard)
-
 Full <- Full %>% select(-`FBS or FCS`) %>%
   separate(`Academic Year`, c("Start.Year", "End.Year")) %>%
   mutate(Start.Year = as.numeric(Start.Year)) %>%
-  mutate(End.Year = as.numeric(End.Year))
+  mutate(End.Year = as.numeric(End.Year)) %>%
+  mutate(Pct = Pct * 100) %>%
+  mutate(centeredAPR = `Multi-Year APR` - mean(`Multi-Year APR`, na.rm = TRUE)) %>% 
+  mutate(Years10 = Start.Year - 2010)
 
 
 library(udpipe)
 
 Full$program.id <- unique_identifier(Full, fields = c("School", "Sport"))
 
-Full <- Full %>% mutate(Years10 = Start.Year - 2010)
-
 write.csv(Full,"C:\\Users\\stick\\Documents\\R\\SeniorProject\\Full_Data.csv", row.names = FALSE)
+
