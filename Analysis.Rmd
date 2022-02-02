@@ -138,7 +138,7 @@ $Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + \epsilon_i,_j,_k$
 ```{r}
 OLSmodel = lm(Pct ~ centeredAPR, data = sports)
 
-OLSmodel
+coef(summary(OLSmodel))
 ```
 
 $Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + s_i + p_i,_j + \epsilon_i,_j,_k$
