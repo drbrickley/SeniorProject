@@ -183,3 +183,14 @@ cat(" Number of Level Two groups = ",
 coef(summary(fullmodel3))
 ```
 
+```{r}
+fullmodel4 = lmer(Pct ~ centeredAPR + (1|School) + (1|program.id) + (1|Years10), REML=T, data=sports)
+
+VCrandom <- VarCorr(fullmodel4)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(fullmodel4)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(fullmodel4)$ngrps[2])
+coef(summary(fullmodel4))
+```
