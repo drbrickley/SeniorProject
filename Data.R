@@ -170,7 +170,12 @@ ScorecardX <- read_xlsx("ScorecardSchools.xlsx")
 
 Full <- Full %>% inner_join(ScorecardX, by = "School")
 
-Test <- Full %>% inner_join(Scorecard, by = c("unitid","Start.Year"="year"))
+Scorecard <- Scorecard %>% distinct()
+
+Full <- Full %>% inner_join(Scorecard, by = c("unitid","Start.Year"="year"))
+
+Full <- Full %>% select(-instnm) %>%
+  rename("School_ID" = unitid)
 
 write.csv(Full,"C:\\Users\\stick\\Documents\\R\\SeniorProject\\Full_Data.csv", row.names = FALSE)
 
