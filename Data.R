@@ -1,6 +1,8 @@
 library(tidyverse)
 library("readxl")
 library(stringr)
+library(udpipe)
+library(rscorecard)
 
 APR <- read_xlsx("All_APR.xlsx")
 
@@ -101,12 +103,74 @@ Full <- Full %>% select(-`FBS or FCS`) %>%
   mutate(End.Year = as.numeric(End.Year)) %>%
   mutate(Pct = Pct * 100) %>%
   mutate(centeredAPR = `Multi-Year APR` - mean(`Multi-Year APR`, na.rm = TRUE)) %>% 
-  mutate(Years10 = Start.Year - 2010)
+  mutate(Years10 = Start.Year - 2010) %>%
+  mutate(program.id = unique_identifier(Full, fields = c("School", "Sport"))) %>%
+  select(-Team, - End.Year) %>%
+  select(Rank, School, Sport, program.id, Start.Year, State, everything())
 
 
-library(udpipe)
+sc_key("1nNjY0a42ZIbyxlydCf2jqiNVqe9Nojz6qcc6KF6")
 
-Full$program.id <- unique_identifier(Full, fields = c("School", "Sport"))
+df10 <- sc_init() %>% 
+  sc_select(unitid, instnm) %>%
+  sc_year(2010) %>%
+  sc_get()
+
+df11 <- sc_init() %>% 
+  sc_select(unitid, instnm) %>%
+  sc_year(2011) %>%
+  sc_get()
+
+df12 <- sc_init() %>% 
+  sc_select(unitid, instnm) %>%
+  sc_year(2012) %>%
+  sc_get()
+
+df13 <- sc_init() %>% 
+  sc_select(unitid, instnm) %>%
+  sc_year(2013) %>%
+  sc_get()
+
+df14 <- sc_init() %>% 
+  sc_select(unitid, instnm) %>%
+  sc_year(2014) %>%
+  sc_get()
+
+df15 <- sc_init() %>% 
+  sc_select(unitid, instnm) %>%
+  sc_year(2015) %>%
+  sc_get()
+
+df16 <- sc_init() %>% 
+  sc_select(unitid, instnm) %>%
+  sc_year(2016) %>%
+  sc_get()
+
+df17 <- sc_init() %>% 
+  sc_select(unitid, instnm) %>%
+  sc_year(2017) %>%
+  sc_get()
+
+df18 <- sc_init() %>% 
+  sc_select(unitid, instnm) %>%
+  sc_year(2018) %>%
+  sc_get()
+
+Scorecard <- rbind(df10, df11)
+
+Scorecard <- Scorecard %>% rbind(Scorecard, df12) %>% 
+  rbind(Scorecard, df13) %>% 
+  rbind(Scorecard, df14) %>% 
+  rbind(Scorecard, df15) %>% 
+  rbind(Scorecard, df16) %>% 
+  rbind(Scorecard, df17) %>% 
+  rbind(Scorecard, df18)
+
+ScorecardX <- read_xlsx("ScorecardSchools.xlsx")
+
+Full <- Full %>% inner_join(ScorecardX, by = "School")
+
+Test <- Full %>% inner_join(Scorecard, by = c("unitid","Start.Year"="year"))
 
 write.csv(Full,"C:\\Users\\stick\\Documents\\R\\SeniorProject\\Full_Data.csv", row.names = FALSE)
 
