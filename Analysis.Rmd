@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning=FALSE)
 ```
 
 ```{r, warning=FALSE}
@@ -121,11 +121,30 @@ ggplot(sports,aes(x=Start.Year,y=Multi.Year.APR)) +
 
 ```{r}
 set.seed(1313)
-randteam = as.vector(sample(sports$program.id,size=25))
+randschool = as.vector(sample(sports$School,size=25))
+schoolsrd <- sports %>%
+  filter(School %in% randschool) %>%
+  group_by(School, Start.Year) %>%
+  summarize(meanAPR = mean(Multi.Year.APR, na.rm = TRUE))
+  
+ggplot(schoolsrd, aes(x=Start.Year, y=meanAPR)) + 
+  facet_wrap(~School,ncol=5) + 
+  geom_point() + 
+  geom_smooth(method="lm") + 
+  theme.1 +
+  theme(strip.text.x=element_blank()) + 
+  labs(x="Academic Year",y="Average Multi-Year APR Score")
+```
+
+```{r}
+set.seed(1313)
+randsport = as.vector(sample(sports$School,size=4))
+
 sportsrd <- sports %>%
-  filter(program.id %in% randteam)
+  filter(School %in% randsport)
+  
 ggplot(sportsrd, aes(x=Start.Year, y=Multi.Year.APR)) + 
-  facet_wrap(~program.id,ncol=5) + 
+  facet_wrap(~program.id,ncol=4) + 
   geom_point() + 
   geom_smooth(method="lm") + 
   theme.1 +

@@ -178,4 +178,3 @@ Full <- Full %>% select(-instnm) %>%
   rename("School_ID" = unitid)
 
 write.csv(Full,"C:\\Users\\stick\\Documents\\R\\SeniorProject\\Full_Data.csv", row.names = FALSE)
-
