@@ -112,47 +112,49 @@ Full <- Full %>% select(-`FBS or FCS`) %>%
 sc_key("1nNjY0a42ZIbyxlydCf2jqiNVqe9Nojz6qcc6KF6")
 
 df10 <- sc_init() %>% 
-  sc_select(unitid, instnm) %>%
+  sc_select(unitid, instnm, region, pcip09, ugds, ugds_white, ugds_men, costt4_a, age_entry) %>%
   sc_year(2010) %>%
   sc_get()
 
+summary(df10)
+
 df11 <- sc_init() %>% 
-  sc_select(unitid, instnm) %>%
+  sc_select(unitid, instnm, region, pcip09, ugds, ugds_white, ugds_men, costt4_a, age_entry) %>%
   sc_year(2011) %>%
   sc_get()
 
 df12 <- sc_init() %>% 
-  sc_select(unitid, instnm) %>%
+  sc_select(unitid, instnm, region, pcip09, ugds, ugds_white, ugds_men, costt4_a, age_entry) %>%
   sc_year(2012) %>%
   sc_get()
 
 df13 <- sc_init() %>% 
-  sc_select(unitid, instnm) %>%
+  sc_select(unitid, instnm, region, pcip09, ugds, ugds_white, ugds_men, costt4_a, age_entry) %>%
   sc_year(2013) %>%
   sc_get()
 
 df14 <- sc_init() %>% 
-  sc_select(unitid, instnm) %>%
+  sc_select(unitid, instnm, region, pcip09, ugds, ugds_white, ugds_men, costt4_a, age_entry) %>%
   sc_year(2014) %>%
   sc_get()
 
 df15 <- sc_init() %>% 
-  sc_select(unitid, instnm) %>%
+  sc_select(unitid, instnm, region, pcip09, ugds, ugds_white, ugds_men, costt4_a, age_entry) %>%
   sc_year(2015) %>%
   sc_get()
 
 df16 <- sc_init() %>% 
-  sc_select(unitid, instnm) %>%
+  sc_select(unitid, instnm, region, pcip09, ugds, ugds_white, ugds_men, costt4_a, age_entry) %>%
   sc_year(2016) %>%
   sc_get()
 
 df17 <- sc_init() %>% 
-  sc_select(unitid, instnm) %>%
+  sc_select(unitid, instnm, region, pcip09, ugds, ugds_white, ugds_men, costt4_a, age_entry) %>%
   sc_year(2017) %>%
   sc_get()
 
 df18 <- sc_init() %>% 
-  sc_select(unitid, instnm) %>%
+  sc_select(unitid, instnm, region, pcip09, ugds, ugds_white, ugds_men, costt4_a, age_entry) %>%
   sc_year(2018) %>%
   sc_get()
 
@@ -176,5 +178,13 @@ Full <- Full %>% inner_join(Scorecard, by = c("unitid","Start.Year"="year"))
 
 Full <- Full %>% select(-instnm) %>%
   rename("School_ID" = unitid)
+
+summary(Full)
+
+Full_Corr <- Full %>% select(Pct, centeredAPR, region, pcip09, ugds, ugds_men, ugds_white, costt4_a, age_entry)
+
+library(corrplot)
+Corr <- cor(select_if(Full_Corr, is.numeric), use="complete.obs")
+corrplot(Corr)
 
 write.csv(Full,"C:\\Users\\stick\\Documents\\R\\SeniorProject\\Full_Data.csv", row.names = FALSE)
