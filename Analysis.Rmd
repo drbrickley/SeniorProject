@@ -128,6 +128,14 @@ corrplot(Corr)
 ```
 
 ```{r}
+LMRegion <- ggplot(sports, aes(x = centeredAPR, y = Pct, color = as.factor(region))) +
+  geom_smooth(method='lm') + 
+  theme.1 + xlim(-200,25)
+
+LMRegion
+```
+
+```{r}
 set.seed(1313)
 randschool = as.vector(sample(sports$School,size=25))
 schoolsrd <- sports %>%
@@ -160,60 +168,102 @@ ggplot(sportsrd, aes(x=Start.Year, y=Multi.Year.APR)) +
   labs(x="Academic Year",y="Multi-Year APR Score")
 ```
 
-$Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + \epsilon_i,_j,_k$
+$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \epsilon_i,_j,_k$
 
 ```{r}
-OLSmodel = lm(Pct ~ centeredAPR, data = sports)
+OLSpartial = lm(Pct ~ centeredAPR, data = sports)
 
-coef(summary(OLSmodel))
+coef(summary(OLSpartial))
 ```
 
-```{r}
-LMRegion <- ggplot(sports, aes(x = centeredAPR, y = Pct, color = as.factor(region))) +
-  geom_smooth(method='lm') + 
-  theme.1 + xlim(-200,25)
+$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + \epsilon_i,_j,_k$
 
-LMRegion
+```{r}
+OLSfull = lm(Pct ~ centeredAPR + ugds + pcip09 + factor(region), data = sports)
+
+coef(summary(OLSfull))
 ```
 
-$Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + s_i + p_i,_j + \epsilon_i,_j,_k$
+$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + s_i + p_i,_j + \epsilon_i,_j,_k$
 
 ```{r}
-fullmodel = lmer(Pct ~ centeredAPR + (1|School) + (1|program.id), REML=T, data=sports)
+partialintercept = lmer(Pct ~ centeredAPR + (1|School) + (1|program.id), REML=T, data=sports)
 
-VCrandom <- VarCorr(fullmodel)
+VCrandom <- VarCorr(partialintercept)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
 cat(" Number of Level Two groups = ",
-    summary(fullmodel)$ngrps[1], "\n", 
+    summary(partialintercept)$ngrps[1], "\n", 
     "Number of Level Three groups = ",
-    summary(fullmodel)$ngrps[2])
-coef(summary(fullmodel))
+    summary(partialintercept)$ngrps[2])
+coef(summary(partialintercept))
 ```
 
-$Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + s_i + m_iAPR + p_i,_j + \epsilon_i,_j,_k$
+$Y_i,_j,_k = \alpha_0 + \beta_1APR_i,_j,_k  + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + s_i + p_i,_j + \epsilon_i,_j,_k$
 
 ```{r}
-fullmodel2 = lmer(Pct ~ centeredAPR + (centeredAPR|School) + (1|program.id), REML=T, data=sports)
+fullintercept = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(region) + (1|School) + (1|program.id), REML=T, data=sports)
 
-VCrandom <- VarCorr(fullmodel2)
+VCrandom <- VarCorr(fullintercept)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
 cat(" Number of Level Two groups = ",
-    summary(fullmodel2)$ngrps[1], "\n", 
+    summary(fullintercept)$ngrps[1], "\n", 
     "Number of Level Three groups = ",
-    summary(fullmodel2)$ngrps[2])
-coef(summary(fullmodel2))
+    summary(fullintercept)$ngrps[2])
+coef(summary(fullintercept))
 ```
 
-$Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + s_i + p_i,_j + m_iAPR + \epsilon_i,_j,_k$
+$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + s_i + m_iAPR + p_i,_j + \epsilon_i,_j,_k$
 
 ```{r}
-fullmodel3 = lmer(Pct ~ centeredAPR + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
+partialschoolslope = lmer(Pct ~ centeredAPR + (centeredAPR|School) + (1|program.id), REML=T, data=sports)
 
-VCrandom <- VarCorr(fullmodel3)
+VCrandom <- VarCorr(partialschoolslope)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
 cat(" Number of Level Two groups = ",
-    summary(fullmodel3)$ngrps[1], "\n", 
+    summary(partialschoolslope)$ngrps[1], "\n", 
     "Number of Level Three groups = ",
-    summary(fullmodel3)$ngrps[2])
-coef(summary(fullmodel3))
+    summary(partialschoolslope)$ngrps[2])
+coef(summary(partialschoolslope))
+```
+
+$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + s_i + m_iAPR + p_i,_j + \epsilon_i,_j,_k$
+
+```{r}
+fullschoolslope = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(region) + (centeredAPR|School) + (1|program.id), REML=T, data=sports)
+
+VCrandom <- VarCorr(fullschoolslope)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(fullschoolslope)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(fullschoolslope)$ngrps[2])
+coef(summary(fullschoolslope))
+```
+
+$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + s_i + p_i,_j + m_iAPR + \epsilon_i,_j,_k$
+
+```{r}
+partialprogramslope = lmer(Pct ~ centeredAPR + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
+
+VCrandom <- VarCorr(partialprogramslope)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(partialprogramslope)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(partialprogramslope)$ngrps[2])
+coef(summary(partialprogramslope))
+```
+
+$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + s_i + p_i,_j + m_iAPR + \epsilon_i,_j,_k$
+
+```{r}
+fullprogramslope = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(region) + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
+
+VCrandom <- VarCorr(fullprogramslope)
+print(VCrandom, comp = c("Variance", "Std.Dev."))
+cat(" Number of Level Two groups = ",
+    summary(fullprogramslope)$ngrps[1], "\n", 
+    "Number of Level Three groups = ",
+    summary(fullprogramslope)$ngrps[2])
+coef(summary(fullprogramslope))
 ```
