@@ -177,7 +177,10 @@ Scorecard <- Scorecard %>% distinct()
 Full <- Full %>% inner_join(Scorecard, by = c("unitid","Start.Year"="year"))
 
 Full <- Full %>% select(-instnm) %>%
-  rename("School_ID" = unitid)
+  rename("School_ID" = unitid) %>%
+  mutate(pcip09 = pcip09 * 100,
+         ugds_men = ugds_men * 100,
+         ugds_white = ugds_white * 100)
 
 summary(Full)
 

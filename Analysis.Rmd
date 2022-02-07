@@ -24,6 +24,7 @@ library(boot)
 library(HLMdiag)
 library(pander)
 library(skimr)
+library(corrplot)
 ```
 
 ```{r}
@@ -120,6 +121,13 @@ ggplot(sports,aes(x=Start.Year,y=Multi.Year.APR)) +
 ```
 
 ```{r}
+select_sports <- sports %>% select(Pct, centeredAPR, pcip09, ugds, ugds_men, ugds_white, costt4_a, age_entry) %>%
+  rename('Win Percentage' = Pct, "APR" = centeredAPR, "Percent Communication" = pcip09, "Students Enrolled" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost" = costt4_a, "Average age at entry" = age_entry)
+Corr <- cor(select_if(select_sports, is.numeric), use="complete.obs")
+corrplot(Corr)
+```
+
+```{r}
 set.seed(1313)
 randschool = as.vector(sample(sports$School,size=25))
 schoolsrd <- sports %>%
@@ -158,6 +166,14 @@ $Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + \epsilon_i,_j,_k$
 OLSmodel = lm(Pct ~ centeredAPR, data = sports)
 
 coef(summary(OLSmodel))
+```
+
+```{r}
+LMRegion <- ggplot(sports, aes(x = centeredAPR, y = Pct, color = as.factor(region))) +
+  geom_smooth(method='lm') + 
+  theme.1 + xlim(-200,25)
+
+LMRegion
 ```
 
 $Y_i,_j,_k = \beta_0 +\beta_1APR_i,_j,_k + s_i + p_i,_j + \epsilon_i,_j,_k$
