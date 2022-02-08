@@ -31,24 +31,25 @@ library(corrplot)
 sports <- read.csv("Full_Data.csv")
 ```
 
-```{r}
-head(sports, 15)
-range(sports$program.id)
-skim(sports)
+```{r, results = 'hide'}
+head(sports, 5)
 ```
 
 ```{r}
+skim(sports)
+```
+
+```{r, results = "hide"}
 sports %>% count(School)
 sports %>% count(Start.Year)
 ```
 
 
-```{r}
+```{r, results = 'hide'}
 select <- dplyr::select
 keydata <- sports %>% 
   dplyr::select(Rank, W, L, T, program.id,
       Pct, Start.Year, Sport, School, State, Multi.Year.APR, Penalties, Postseason)
-keydata
 # Create Level2 data set by picking off one observation 
 # per subject, which would be easier if every subject 
 # had a diary entry labeled '1' - should be 37 rows 
@@ -76,7 +77,7 @@ year.lev2 <- year.lev2 %>%
   left_join(meanbyyear, by = "Start.Year")
 ```
 
-```{r}
+```{r, results = 'hide'}
 sports %>% count(Sport)
 ```
 
