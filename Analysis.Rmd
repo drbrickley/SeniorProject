@@ -268,3 +268,27 @@ cat(" Number of Level Two groups = ",
     summary(fullprogramslope)$ngrps[2])
 coef(summary(fullprogramslope))
 ```
+
+# The Effect of Academic Performance on Athletic Success in Collegiate Athletic Programs
+
+## Introduction
+
+
+
+## Data
+
+
+
+## Methodology
+
+
+
+## Results
+
+
+
+## Conclusion
+
+
+
+## References
