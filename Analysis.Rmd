@@ -8,7 +8,7 @@ output: html_document
 
 <style type="text/css">
   body{
-  font-size: 12pt;
+  font-size: 16pt;
 }
 </style>
 
@@ -39,12 +39,18 @@ library(corrplot)
 sports <- read.csv("Full_Data.csv")
 ```
 
-```{r, results = 'hide'}
-head(sports, 5)
+```{r table1,echo=FALSE, warning = FALSE}
+table1 <- sports %>% select(School, "School ID" = School_ID, "Region" = region, "Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Program ID" = program.id, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
+preview <- head(table1, 5)
+kable(preview, booktabs=T,
+      caption="Table 1: A snapshot of selected variables from the first five observations in the academics and athletics combined dataset.") %>%
+    kable_styling(latex_options = "scale_down", font_size = 16) 
 ```
 
 ```{r}
-skim(sports)
+select
+summary <- summary(sports)
+kable(summary)
 ```
 
 ```{r, results = "hide"}
@@ -299,18 +305,20 @@ coef(summary(fullprogramslope))
   As with any form of modeling it is important to hold constant variables that may bias results and affect their validity.  The College Scorecard data is used to include school-level variables and to determine what aspects of a school would have an effect on its sports' win percentages.  
   
   The first variable that was considered for its relevance was geographic region.  Minyong Song and Yang Zhang's Study, *Research on the Relationship between Geographical Factors, Sports and Culture*, they conclude that "The geographical environment influences the emergence and development of sports events in different ways, Climate changes will affect the conditions of sports, but also interfere with the athletes’ body mechanism and emotion, thereby affecting athletic ability."  Their findings give merit to consider geographic region as a possible influence on win percentage.  The breakdown that follows is the classification of the geographic regions:
-    - 0	U.S. Service Schools
-    - 1	New England (CT, ME, MA, NH, RI, VT)
-    - 2	Mid East (DE, DC, MD, NJ, NY, PA)
-    - 3	Great Lakes (IL, IN, MI, OH, WI)
-    - 4	Plains (IA, KS, MN, MO, NE, ND, SD)
-    - 5	Southeast (AL, AR, FL, GA, KY, LA, MS, NC, SC, TN, VA, WV)
-    - 6	Southwest (AZ, NM, OK, TX)
-    - 7	Rocky Mountains (CO, ID, MT, UT, WY)
-    - 8	Far West (AK, CA, HI, NV, OR, WA)
-    - 9	Outlying Areas (AS, FM, GU, MH, MP, PR, PW, VI)
+  
+- 0	U.S. Service Schools
+- 1	New England (CT, ME, MA, NH, RI, VT)
+- 2	Mid East (DE, DC, MD, NJ, NY, PA)
+- 3	Great Lakes (IL, IN, MI, OH, WI)
+- 4	Plains (IA, KS, MN, MO, NE, ND, SD)
+- 5	Southeast (AL, AR, FL, GA, KY, LA, MS, NC, SC, TN, VA, WV)
+- 6	Southwest (AZ, NM, OK, TX)
+- 7	Rocky Mountains (CO, ID, MT, UT, WY)
+- 8	Far West (AK, CA, HI, NV, OR, WA)
+- 9	Outlying Areas (AS, FM, GU, MH, MP, PR, PW, VI)
     
-  One other variable that needs to be considered is the percentage of the student body majoring in communication.  This is a very specific variable, but its potential inclusion in our data stems from the phenomenon of major clustering.  Programs and schools that cluster their student athletes into an easier, or less time-intensive major may have more energy to focus on athletics.  In addition, this may allow more student-athletes to remain eligible with a smaller work-load that some majors may offer.  Different institutions have been accused of clustering into different majors, but multiple of the accusations reinforce communications as one of the common majors subject to clustering.  As such we would expect that as the percentage of the student body majoring in communication increases we would see a corresponding increase in those programs' win percentages.  Kaydee McCormick found in their research that although clustering appears to have the possibility to occur among all college students, it seems to be more prevalent within intercollegiate athletics.  As such, if we find clustering in the general student-body it is reasonable to assume that the athletic programs at that institution are subject to clustering as well.  For uniformity and ease of interpretation, all percentages were changed from a scale of 0.00 to 1.00 to a scale of 0 to 100.
+    
+One other variable that needs to be considered is the percentage of the student body majoring in communication.  This is a very specific variable, but its potential inclusion in our data stems from the phenomenon of major clustering.  Programs and schools that cluster their student athletes into an easier, or less time-intensive major may have more energy to focus on athletics.  In addition, this may allow more student-athletes to remain eligible with a smaller work-load that some majors may offer.  Different institutions have been accused of clustering into different majors, but multiple of the accusations reinforce communications as one of the common majors subject to clustering.  As such we would expect that as the percentage of the student body majoring in communication increases we would see a corresponding increase in those programs' win percentages.  Kaydee McCormick found in their research that although clustering appears to have the possibility to occur among all college students, it seems to be more prevalent within intercollegiate athletics.  As such, if we find clustering in the general student-body it is reasonable to assume that the athletic programs at that institution are subject to clustering as well.  For uniformity and ease of interpretation, all percentages were changed from a scale of 0.00 to 1.00 to a scale of 0 to 100.
   
   Three other variables of the student body are potentially relevant for this research: The percent of the student body that is white, the percent of the student body that is male, and the average age of enrollment.  Collegiate student-athletes are a sample of the general student body, and as such we assume the demographics of the student body are representative of their student-athletes.  Ethnicity, gender, and age all impact sport participation, so we must consider them as possible controls.  Again for uniformity and ease of interpretation, the percentage male and percent white were changed from a scale of 0.00 to 1.00 to a scale of 0 to 100.
   
