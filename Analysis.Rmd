@@ -5,6 +5,14 @@ date: "1/26/2022"
 output: html_document
 ---
 
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning=FALSE)
 ```
@@ -49,7 +57,7 @@ sports %>% count(Start.Year)
 select <- dplyr::select
 keydata <- sports %>% 
   dplyr::select(Rank, W, L, T, program.id,
-      Pct, Start.Year, Sport, School, State, Multi.Year.APR, Penalties, Postseason)
+      Pct, Start.Year, Sport, School, State, Multi.Year.APR)
 # Create Level2 data set by picking off one observation 
 # per subject, which would be easier if every subject 
 # had a diary entry labeled '1' - should be 37 rows 
