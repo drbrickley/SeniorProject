@@ -39,20 +39,6 @@ library(corrplot)
 sports <- read.csv("Full_Data.csv")
 ```
 
-```{r table1,echo=FALSE, warning = FALSE}
-table1 <- sports %>% select(School, "School ID" = School_ID, "Region" = region, "Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Program ID" = program.id, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
-preview <- head(table1, 5)
-kable(preview, booktabs=T,
-      caption="Table 1: A snapshot of selected variables from the first five observations in the academics and athletics combined dataset.") %>%
-    kable_styling(latex_options = "scale_down", font_size = 16) 
-```
-
-```{r}
-select
-summary <- summary(sports)
-kable(summary)
-```
-
 ```{r, results = "hide"}
 sports %>% count(School)
 sports %>% count(Start.Year)
@@ -95,7 +81,7 @@ year.lev2 <- year.lev2 %>%
 sports %>% count(Sport)
 ```
 
-```{r}
+```{r, results = 'hide'}
 theme.1 <- theme(axis.title.x = element_text(size = 14),
   axis.title.y = element_text(size = 14),
   plot.title=element_text(hjust=.9,face="italic",size=12))
@@ -120,15 +106,6 @@ mli.hist1 <- grid.arrange(apr.all,apr.mean,year.apr.mean, ncol=1)
 ```
 
 ```{r}
-box.sport <- ggplot(data=sports,aes(factor(Sport),Multi.Year.APR)) +
-  geom_boxplot() + 
-  theme.1 + coord_flip() + ylab("Multi-Year APR") + 
-  xlab("") + labs(title="(a)")
-
-mli.boxscatmat1 <- grid.arrange(box.sport,ncol=1)
-```
-
-```{r}
 ggplot(sports,aes(x=Start.Year,y=Multi.Year.APR)) +
   geom_smooth(method= "lm", color = "black") + 
   labs(x="Academic Year",y="Multi-Year APR Score") +
@@ -144,7 +121,7 @@ corrplot(Corr, type = "full", order = "hclust",
 ```
 
 ```{r}
-LMRegion <- ggplot(sports, aes(x = centeredAPR, y = Pct, color = as.factor(region))) +
+LMRegion <- ggplot(sports, aes(x = centeredAPR, y = Pct, color = as.factor(Region))) +
   geom_smooth(method='lm') + 
   theme.1 + xlim(-200,25)
 
@@ -195,7 +172,7 @@ coef(summary(OLSpartial))
 $Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + \epsilon_i,_j,_k$
 
 ```{r}
-OLSfull = lm(Pct ~ centeredAPR + ugds + pcip09 + factor(region), data = sports)
+OLSfull = lm(Pct ~ centeredAPR + ugds + pcip09 + factor(Region), data = sports)
 
 coef(summary(OLSfull))
 ```
@@ -217,7 +194,7 @@ coef(summary(partialintercept))
 $Y_i,_j,_k = \alpha_0 + \beta_1APR_i,_j,_k  + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + s_i + p_i,_j + \epsilon_i,_j,_k$
 
 ```{r}
-fullintercept = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(region) + (1|School) + (1|program.id), REML=T, data=sports)
+fullintercept = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(Region) + (1|School) + (1|program.id), REML=T, data=sports)
 
 VCrandom <- VarCorr(fullintercept)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -245,7 +222,7 @@ coef(summary(partialschoolslope))
 $Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + s_i + m_iAPR + p_i,_j + \epsilon_i,_j,_k$
 
 ```{r}
-fullschoolslope = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(region) + (centeredAPR|School) + (1|program.id), REML=T, data=sports)
+fullschoolslope = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(Region) + (centeredAPR|School) + (1|program.id), REML=T, data=sports)
 
 VCrandom <- VarCorr(fullschoolslope)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -273,7 +250,7 @@ coef(summary(partialprogramslope))
 $Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + s_i + p_i,_j + m_iAPR + \epsilon_i,_j,_k$
 
 ```{r}
-fullprogramslope = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(region) + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
+fullprogramslope = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(Region) + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
 
 VCrandom <- VarCorr(fullprogramslope)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -296,11 +273,45 @@ coef(summary(fullprogramslope))
 
   The data in this research merged two datasets from the NCAA and data from the College Scorecard.  The resulting dataframe is panel data that contains data from 394 schools and nine different sports over eight years.  This study focuses only on team sports and the relationship between team academic performance and that team's athletic success.  Specifically this data was filtered to focus on nine team sports: Men's Soccer, Women's Soccer, Baseball, Softball, Men's Basketball, Women's Basketball, Football, Men's Ice Hockey, and Women's Ice Hockey.  In total there are 17,700 observations with 21 variables.  
   
-  The first dataset used is the online NCAA Academic Progress Rate Database. From this the variables of interest are the schools, the state each school is in, the various sports, the individual years, and each specific program's APR score.  Each athlete on the team can receive at most 2 points, one for remaining eligible over the semester and another for staying at the institution. So, each athlete can have anywhere between zero and two points for a given semester. The APR score for each Division I team is calculated by adding all points earned by the team and dividing that total by the maximum possible number of points that could have been earned. This percentage is then multiplied by 1,000 to return the team’s APR score. Thus, an APR of 950 means that the student-athletes in the cohort earned 95 percent of the eligibility and retention points that they could have earned.  It is important to note that APR in this dataset represents a four-year rolling average of APR scores. 
+```{r table1,fig.align="center",out.width="60%",echo=FALSE, warning = FALSE}
+table1 <- sports %>% select(School, "School ID" = School_ID, Region, "Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Program ID" = program.id, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
+preview <- head(table1, 5)
+kable(preview, booktabs=T,
+      caption="Table 1: A snapshot of selected variables from the first five observations in the academics and athletics combined dataset.") %>%
+    kable_styling(latex_options = "scale_down", font_size = 16) 
+```
   
-  The second NCAA dataset is a combination of datasets of the nine different team sports and their athletic performance in each year from 2010-2018.  The important variables from this database are the team name, the number of wins, losses, and ties, the team's win percentage, and the year of observation.  With each dataset, it was necessary to create a new variable for the sport to keep track of which program is being observed when all datasets are merged together.  Some datasets did not have a column for ties, and as such it was necessary to create an empty column for ties that allowed for the rows in all athletic datasets to be binded together.  In some cases, the individual sports reported win percentage differently than others.  Multiple sports reported win percentage as a percentage with range from 0 to 100, while other sports reported it as a decimal 0.00 to 1.00.  For uniformity and ease of interpretation, all percentages were changed to a scale of 0 to 100.  
+  The first dataset used is the online NCAA Academic Progress Rate Database. From this the variables of interest are the schools, the state each school is in, the various sports, the individual years, and each specific program's APR score.  Each athlete on the team can receive at most 2 points, one for remaining eligible over the semester and another for staying at the institution. So, each athlete can have anywhere between zero and two points for a given semester. The APR score for each Division I team is calculated by adding all points earned by the team and dividing that total by the maximum possible number of points that could have been earned. This percentage is then multiplied by 1,000 to return the team’s APR score. Thus, an APR of 950 means that the student-athletes in the cohort earned 95 percent of the eligibility and retention points that they could have earned.  It is important to note that APR in this dataset represents a four-year rolling average of APR scores.
+  
+```{r figure1,fig.align="center",out.width="60%",fig.cap= 'Figure 1: Boxplots of Multi-Year APR scores for each sport. Plot (a) is based on all 17,700 observations from all 2,168 programs over all years, while plot (b) uses only one observation per program', echo=FALSE, warning=FALSE}
+box.sport <- ggplot(data=sports,aes(factor(Sport),Multi.Year.APR)) +
+  geom_boxplot() + 
+  theme.1 + coord_flip() + ylab("Multi-Year APR") + 
+  xlab("") + labs(title="(a)")
+
+select_year <- sports %>% group_by(program.id, Sport) %>%
+  summarize(MeanAPR = mean(Multi.Year.APR))
+
+box.sport2 <- ggplot(data=select_year,aes(factor(Sport),MeanAPR)) +
+  geom_boxplot() + 
+  theme.1 + coord_flip() + ylab("Mean APR") + 
+  xlab("") + labs(title="(b)")
+
+grid.arrange(box.sport, box.sport2, ncol = 1)
+```
+  
+  The second NCAA dataset is a combination of datasets of the nine different team sports and their athletic performance in each year from 2010-2018.  The important variables from this database are the team name, the team's win percentage, and the year of observation.  With each dataset, it was necessary to create a new variable for the sport to keep track of which program is being observed when all datasets are merged together.  Some datasets did not have a column for ties, and as such it was necessary to create an empty column for ties that allowed for the rows in all athletic datasets to be binded together.  In some cases, the individual sports reported win percentage differently than others.  Multiple sports reported win percentage as a percentage with range from 0 to 100, while other sports reported it as a decimal 0.00 to 1.00.  For uniformity and ease of interpretation, all percentages were changed to a scale of 0 to 100.  
   
   The final data accessed is the College Scorecard data.  This database provides information about each specific institution not specific to athletics.  Each observation has the school's ID number and the name of the school.  For each school in each year the variables that were considered for their relevance are the geographic region of the school, the percent of the student body majoring in communication, the percentage of degrees awarded in Communication, Journalism, And Related Programs, the total enrollment, the percent of the student body that is white, the percent of the student body that is male, the average cost of attendance in each year, and the age at which students enroll at the institution.  
+  
+```{r table2, echo=FALSE, warning=FALSE}
+summarydata <- sports %>% select(School, "School ID" = School_ID, Region, "Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Program ID" = program.id, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
+
+summary <- summary(sports)
+kable(summary, booktabs=T,
+      caption="Table 2: Summary Statistics of the combined datasets.") %>%
+    kable_styling(latex_options = "scale_down", font_size = 16)
+```
   
   As with any form of modeling it is important to hold constant variables that may bias results and affect their validity.  The College Scorecard data is used to include school-level variables and to determine what aspects of a school would have an effect on its sports' win percentages.  
   

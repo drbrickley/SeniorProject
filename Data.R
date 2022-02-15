@@ -180,14 +180,11 @@ Full <- Full %>% select(-instnm, -Penalties, -Postseason) %>%
   rename("School_ID" = unitid) %>%
   mutate(pcip09 = pcip09 * 100,
          ugds_men = ugds_men * 100,
-         ugds_white = ugds_white * 100)
+         ugds_white = ugds_white * 100,
+         Region = as.factor(region)) %>%
+  select(-region, -W, -L, -T, -Rank)
 
 summary(Full)
 
-Full_Corr <- Full %>% select(Pct, centeredAPR, region, pcip09, ugds, ugds_men, ugds_white, costt4_a, age_entry)
-
-library(corrplot)
-Corr <- cor(select_if(Full_Corr, is.numeric), use="complete.obs")
-corrplot(Corr)
 
 write.csv(Full,"C:\\Users\\stick\\Documents\\R\\SeniorProject\\Full_Data.csv", row.names = FALSE)
