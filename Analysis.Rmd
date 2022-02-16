@@ -48,7 +48,7 @@ sports %>% count(Start.Year)
 ```{r, results = 'hide'}
 select <- dplyr::select
 keydata <- sports %>% 
-  dplyr::select(Rank, W, L, T, program.id,
+  dplyr::select(program.id,
       Pct, Start.Year, Sport, School, State, Multi.Year.APR)
 # Create Level2 data set by picking off one observation 
 # per subject, which would be easier if every subject 
