@@ -307,7 +307,7 @@ grid.arrange(box.sport, box.sport2, ncol = 1)
 ```{r table2, echo=FALSE, warning=FALSE}
 summarydata <- sports %>% select(School, "School ID" = School_ID, Region, "Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Program ID" = program.id, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
 
-summary <- summary(sports)
+summary <- summary(summarydata)
 kable(summary, booktabs=T,
       caption="Table 2: Summary Statistics of the combined datasets.") %>%
     kable_styling(latex_options = "scale_down", font_size = 16)
