@@ -340,7 +340,17 @@ One other variable that needs to be considered is the percentage of the student 
 
 ## Methodology
 
+  To begin with we can look at an Ordinary Least Squares (OLS) regression of Multi-Year APR scores on Win Percentages.  Equation 1 below is the full equation used in our research to calculate the OLS regression coefficients.  $Y_i,_j,_k$ represents the Win Percentage of program $j$ at school $i$ in year $k$.  The $\beta_s$ in this model is the regression coefficient corresponding to each variable in the model.  $\epsilon_i,_j,_k$ then represents the error term capturing the unexplained variability in the model; the random differences within a specific program from year to year.
+  
+  $Equation 1: Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + \epsilon_i,_j,_k$
 
+  However, the statistical modeling used in this research is a three-level mixed effects model.  We can compare our results to a traditional ordinary least squares (OLS) linear regression model however our data violates a vital assumption of OLS models: that all entries in the data are independent.  There are three levels in our model in which the entries have the potential to be correlated to one another: the school or institution level, the level containing each specific program, and the year level.  The key difference between an OLS model and a mixed effects model is the inclusion of random effects.  These random variables control for the random variability at each level in our model.
+  
+  The first level, the schools, are very important to consider.  Any entries from a specific college or university are going to be correlated with other entries from the same school.  For example, the win percentage of any program at the University of Michigan is going to be correlated with the win percentage at the University of Michigan in other entries, therefore not all entries are independent.  
+  
+  The second level in our model is the program level.  In this level it is important to take note that the win percentage of a specific program in one year is going to be correlated with other entries from the same program.  The University of Alabama historically has a very successful football program, and we can expect that the win percentage of the University of Alabama in 2010 is not independent from its win percentage in 2011.  
+  
+  The third and final level in this model is the year.  For this level we  need to consider that for any one program at any specific school, there will be random difference from year to year.
 
 ## Results
 
