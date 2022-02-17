@@ -102,30 +102,14 @@ year.apr.mean <- ggplot(data=year.lev2,aes(x=meanbyyear)) +
                  color = "black") + 
   theme.1 + xlim(800,1000) +
   xlab("Mean APR Score by Year") + ylab("Frequency") + labs(title="(c)") 
-mli.hist1 <- grid.arrange(apr.all,apr.mean,year.apr.mean, ncol=1)
+### mli.hist1 <- grid.arrange(apr.all,apr.mean,year.apr.mean, ncol=1)
 ```
 
 ```{r}
-ggplot(sports,aes(x=Start.Year,y=Multi.Year.APR)) +
-  geom_smooth(method= "lm", color = "black") + 
-  labs(x="Academic Year",y="Multi-Year APR Score") +
-  theme.1
-```
-
-```{r}
-select_sports <- sports %>% select(Pct, centeredAPR, pcip09, ugds, ugds_men, ugds_white, costt4_a, age_entry) %>%
-  rename('Win Percentage' = Pct, "APR" = centeredAPR, "Percent Communication" = pcip09, "Students Enrolled" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost" = costt4_a, "Average age at entry" = age_entry)
-Corr <- cor(select_if(select_sports, is.numeric), use="complete.obs")
-corrplot(Corr, type = "full", order = "hclust", 
-         tl.col = "black", tl.srt = 45)
-```
-
-```{r}
-LMRegion <- ggplot(sports, aes(x = centeredAPR, y = Pct, color = as.factor(Region))) +
-  geom_smooth(method='lm') + 
-  theme.1 + xlim(-200,25)
-
-LMRegion
+### ggplot(sports,aes(x=Start.Year,y=Multi.Year.APR)) +
+###  geom_smooth(method= "lm", color = "black") + 
+###  labs(x="Academic Year",y="Multi-Year APR Score") +
+###  theme.1
 ```
 
 ```{r}
@@ -339,6 +323,29 @@ One other variable that needs to be considered is the percentage of the student 
 
 
 ## Methodology
+
+  Our main purpose is to interpret how program's APR scores, measuring academic success, impact program's win percentages.  Using Ordinary Least Squares regression and multiple mixed-effects models, we can evaluate this relationship.  However, it is important to include variables in our models that impact a program's win percentage outside of APR scores.  By looking at each variable from the College Scorecard Database and its correlation with APR scores and win percentage we can see if it is valuable to the models.  Figure 2 (below) explores this correlation between each variable, where a darker red indicates a stronger, negative correlation and a darker blue indicates a stronger positive correlation.  On the diagonal we see the large dark blue circles, representing that each variable is perfectly correlated with itself.  Looking at the row and column for win percentage in Figure 2, we can see that APR Scores and the total student enrollment are the most correlated with win percentage, the percent communication and percent male have very small correlation, and the average cost and average age have essentially no correlation.  With no correlation, the average cost and average age of enrollment will not be included in the models as they add no value to our results.
+  
+```{r, fig.cap="Figure 2: The correlation between variables"}
+select_sports <- sports %>% select(Pct, centeredAPR, pcip09, ugds, ugds_men, ugds_white, costt4_a, age_entry) %>%
+  rename('Win Percentage' = Pct, "APR" = centeredAPR, "Percent Communication; Etc." = pcip09, "Students Enrolled" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost" = costt4_a, "Average age at entry" = age_entry)
+Corr <- cor(select_if(select_sports, is.numeric), use="complete.obs")
+corrplot(Corr, type = "lower", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+```
+
+  It is also important to explore the possibility of differences in location.  Perhaps programs in the Southwest have higher win percentages on average than programs in New England.  Figure 3 (below) demonstrates differences in win percentage for the different geographic regions.  Generally speaking, all regions have a median win percentage of roughly 50%. 
+  
+```{r figure3, fig.cap="Figure 3: The distribution of Win Percentages in different geographic locations"}
+LMRegion <- ggplot(sports, aes(x = Pct, as.factor(Region))) +
+  geom_boxplot(method='lm', se = FALSE) + 
+  theme.1 +
+  labs(x='Win Percentage', y='Geographic Region',title='The Difference in APR by Region')
+
+LMRegion
+```
+
+  In the models used throughout our research, we will explore the effect inclusion of these correlated variables have to our results.  One area of concern arises when considering the inclusion of the percent white variable.  Although this variable is correlated with win percentage, it is also highly correlated with the APR scores and may cause an issue of multicollinearity; the two variables may not be independent from each other and the models cannot differentiate the effect of APR scores from the effect of the percentage of white students.  Multicollinearity can cause variations in coefficient estimates and in the significance of our results.  We will include models that include these variables, and models that do not to determine the effect multicollinearity may have based on the differences in our results.
 
   To begin with we can look at an Ordinary Least Squares (OLS) regression of Multi-Year APR scores on Win Percentages.  Equation 1 below is the full equation used in our research to calculate the OLS regression coefficients.  $Y_i,_j,_k$ represents the Win Percentage of program $j$ at school $i$ in year $k$.  The $\beta_s$ in this model is the regression coefficient corresponding to each variable in the model.  $\epsilon_i,_j,_k$ then represents the error term capturing the unexplained variability in the model; the random differences within a specific program from year to year.
   
