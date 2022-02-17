@@ -169,10 +169,10 @@ OLSpartial = lm(Pct ~ centeredAPR, data = sports)
 coef(summary(OLSpartial))
 ```
 
-$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + \epsilon_i,_j,_k$
+$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentWhite + \beta_4PercentCommunication_i + \beta_5NewEngland_i + \beta_6MidEast_i + \beta_7GreatLakes_i + \beta_8Plains_i + \beta_9SouthEast_i + \beta_10SouthWest_i + \beta_11RockyMountains_i + \beta_12FarWest_i + \beta_13Outlying_i ++ \epsilon_i,_j,_k$
 
 ```{r}
-OLSfull = lm(Pct ~ centeredAPR + ugds + pcip09 + factor(Region), data = sports)
+OLSfull = lm(Pct ~ centeredAPR + ugds + ugds_white + pcip09 + factor(Region), data = sports)
 
 coef(summary(OLSfull))
 ```
@@ -191,10 +191,10 @@ cat(" Number of Level Two groups = ",
 coef(summary(partialintercept))
 ```
 
-$Y_i,_j,_k = \alpha_0 + \beta_1APR_i,_j,_k  + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + s_i + p_i,_j + \epsilon_i,_j,_k$
+$Y_i,_j,_k = \alpha_0 + \beta_1APR_i,_j,_k  + \beta_2Enrollment_i + \beta_3PercentWhite + \beta_4PercentCommunication_i + \beta_5NewEngland_i + \beta_6MidEast_i + \beta_7GreatLakes_i + \beta_8Plains_i + \beta_9SouthEast_i + \beta_10SouthWest_i + \beta_11RockyMountains_i + \beta_12FarWest_i + \beta_13Outlying_i + s_i + p_i,_j + \epsilon_i,_j,_k$
 
 ```{r}
-fullintercept = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(Region) + (1|School) + (1|program.id), REML=T, data=sports)
+fullintercept = lmer(Pct ~ centeredAPR + ugds + ugds_white + pcip09 + factor(Region) + (1|School) + (1|program.id), REML=T, data=sports)
 
 VCrandom <- VarCorr(fullintercept)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -219,10 +219,10 @@ cat(" Number of Level Two groups = ",
 coef(summary(partialschoolslope))
 ```
 
-$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + s_i + m_iAPR + p_i,_j + \epsilon_i,_j,_k$
+$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentWhite + \beta_4PercentCommunication_i + \beta_5NewEngland_i + \beta_6MidEast_i + \beta_7GreatLakes_i + \beta_8Plains_i + \beta_9SouthEast_i + \beta_10SouthWest_i + \beta_11RockyMountains_i + \beta_12FarWest_i + \beta_13Outlying_i + s_i + m_iAPR + p_i,_j + \epsilon_i,_j,_k$
 
 ```{r}
-fullschoolslope = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(Region) + (centeredAPR|School) + (1|program.id), REML=T, data=sports)
+fullschoolslope = lmer(Pct ~ centeredAPR + ugds + ugds_white + pcip09 + factor(Region) + (centeredAPR|School) + (1|program.id), REML=T, data=sports)
 
 VCrandom <- VarCorr(fullschoolslope)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -247,10 +247,10 @@ cat(" Number of Level Two groups = ",
 coef(summary(partialprogramslope))
 ```
 
-$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + s_i + p_i,_j + m_iAPR + \epsilon_i,_j,_k$
+$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentWhite + \beta_4PercentCommunication_i + \beta_5NewEngland_i + \beta_6MidEast_i + \beta_7GreatLakes_i + \beta_8Plains_i + \beta_9SouthEast_i + \beta_10SouthWest_i + \beta_11RockyMountains_i + \beta_12FarWest_i + \beta_13Outlying_i + s_i + p_i,_j + m_iAPR + \epsilon_i,_j,_k$
 
 ```{r}
-fullprogramslope = lmer(Pct ~ centeredAPR + ugds + pcip09 + factor(Region) + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
+fullprogramslope = lmer(Pct ~ centeredAPR + ugds + ugds_white + pcip09 + factor(Region) + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
 
 VCrandom <- VarCorr(fullprogramslope)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -283,7 +283,7 @@ kable(preview, booktabs=T,
   
   The first dataset used is the online NCAA Academic Progress Rate Database. From this the variables of interest are the schools, the state each school is in, the various sports, the individual years, and each specific program's APR score.  Each athlete on the team can receive at most 2 points, one for remaining eligible over the semester and another for staying at the institution. So, each athlete can have anywhere between zero and two points for a given semester. The APR score for each Division I team is calculated by adding all points earned by the team and dividing that total by the maximum possible number of points that could have been earned. This percentage is then multiplied by 1,000 to return the team’s APR score. Thus, an APR of 950 means that the student-athletes in the cohort earned 95 percent of the eligibility and retention points that they could have earned.  It is important to note that APR in this dataset represents a four-year rolling average of APR scores.
   
-```{r figure1,fig.align="center",out.width="60%",fig.cap= 'Figure 1: Boxplots of Multi-Year APR scores for each sport. Plot (a) is based on all 17,700 observations from all 2,168 programs over all years, while plot (b) uses only one observation per program', echo=FALSE, warning=FALSE}
+```{r figure1,fig.align="center",out.width="80%",fig.cap= 'Figure 1: Boxplots of Multi-Year APR scores for each sport. Plot (a) is based on all 17,700 observations from all 2,168 programs over all years, while plot (b) uses only one observation per program', echo=FALSE, warning=FALSE}
 box.sport <- ggplot(data=sports,aes(factor(Sport),Multi.Year.APR)) +
   geom_boxplot() + 
   theme.1 + coord_flip() + ylab("Multi-Year APR") + 
@@ -342,7 +342,7 @@ One other variable that needs to be considered is the percentage of the student 
 
   To begin with we can look at an Ordinary Least Squares (OLS) regression of Multi-Year APR scores on Win Percentages.  Equation 1 below is the full equation used in our research to calculate the OLS regression coefficients.  $Y_i,_j,_k$ represents the Win Percentage of program $j$ at school $i$ in year $k$.  The $\beta_s$ in this model is the regression coefficient corresponding to each variable in the model.  $\epsilon_i,_j,_k$ then represents the error term capturing the unexplained variability in the model; the random differences within a specific program from year to year.
   
-  $Equation 1: Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentCommunication_i + \beta_4NewEngland_i + \beta_5MidEast_i + \beta_6GreatLakes_i + \beta_7Plains_i + \beta_8SouthEast_i + \beta_9SouthWest_i + \beta_10RockyMountains_i + \beta_11FarWest_i + \beta_12Outlying_i + \epsilon_i,_j,_k$
+  $Equation 1: Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentWhite + \beta_4PercentCommunication_i + \beta_5NewEngland_i + \beta_6MidEast_i + \beta_7GreatLakes_i + \beta_8Plains_i + \beta_9SouthEast_i + \beta_10SouthWest_i + \beta_11RockyMountains_i + \beta_12FarWest_i + \beta_13Outlying_i + \epsilon_i,_j,_k$
 
   However, the statistical modeling used in this research is a three-level mixed effects model.  We can compare our results to a traditional ordinary least squares (OLS) linear regression model however our data violates a vital assumption of OLS models: that all entries in the data are independent.  There are three levels in our model in which the entries have the potential to be correlated to one another: the school or institution level, the level containing each specific program, and the year level.  The key difference between an OLS model and a mixed effects model is the inclusion of random effects.  These random variables control for the random variability at each level in our model.
   
