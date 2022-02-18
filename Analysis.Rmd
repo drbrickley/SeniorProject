@@ -148,15 +148,23 @@ ggplot(sportsrd, aes(x=Start.Year, y=Multi.Year.APR)) +
 $Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \epsilon_i,_j,_k$
 
 ```{r}
-OLSpartial = lm(Pct ~ centeredAPR, data = sports)
+OLSinitial = lm(Pct ~ centeredAPR, data = sports)
+
+coef(summary(OLSinitial))
+```
+
+
+
+```{r}
+OLSpartial = lm(Pct ~ centeredAPR + ugds + ugds_white, data = sports)
 
 coef(summary(OLSpartial))
 ```
 
-$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentWhite + \beta_4PercentCommunication_i + \beta_5NewEngland_i + \beta_6MidEast_i + \beta_7GreatLakes_i + \beta_8Plains_i + \beta_9SouthEast_i + \beta_10SouthWest_i + \beta_11RockyMountains_i + \beta_12FarWest_i + \beta_13Outlying_i ++ \epsilon_i,_j,_k$
+$Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentWhite + \beta_4PercentMale + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + \epsilon_i,_j,_k$
 
 ```{r}
-OLSfull = lm(Pct ~ centeredAPR + ugds + ugds_white + pcip09 + factor(Region), data = sports)
+OLSfull = lm(Pct ~ centeredAPR + ugds + ugds_white + ugds_men + pcip09 + factor(Region), data = sports)
 
 coef(summary(OLSfull))
 ```
@@ -255,7 +263,7 @@ coef(summary(fullprogramslope))
 
 ## Data
 
-  The data in this research merged two datasets from the NCAA and data from the College Scorecard.  The resulting dataframe is panel data that contains data from 394 schools and nine different sports over eight years.  This study focuses only on team sports and the relationship between team academic performance and that team's athletic success.  Specifically this data was filtered to focus on nine team sports: Men's Soccer, Women's Soccer, Baseball, Softball, Men's Basketball, Women's Basketball, Football, Men's Ice Hockey, and Women's Ice Hockey.  In total there are 17,700 observations with 21 variables.  
+  The data in this research merged two datasets from the NCAA and data from the College Scorecard.  The resulting dataframe is panel data that contains data from 394 schools and nine different sports over eight years.  This study focuses only on team sports and the relationship between team academic performance and that team's athletic success.  Specifically this data was filtered to focus on nine team sports: Men's Soccer, Women's Soccer, Baseball, Softball, Men's Basketball, Women's Basketball, Football, Men's Ice Hockey, and Women's Ice Hockey.  In total there are 17,700 observations with 17 variables.  Table 1 (below) shows the first five rows of the data and the 14 main variables that are important to this research, excluding shifted variables for year and APR score and the specific state of the school.
   
 ```{r table1,fig.align="center",out.width="60%",echo=FALSE, warning = FALSE}
 table1 <- sports %>% select(School, "School ID" = School_ID, Region, "Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Program ID" = program.id, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
@@ -265,20 +273,21 @@ kable(preview, booktabs=T,
     kable_styling(latex_options = "scale_down", font_size = 16) 
 ```
   
-  The first dataset used is the online NCAA Academic Progress Rate Database. From this the variables of interest are the schools, the state each school is in, the various sports, the individual years, and each specific program's APR score.  Each athlete on the team can receive at most 2 points, one for remaining eligible over the semester and another for staying at the institution. So, each athlete can have anywhere between zero and two points for a given semester. The APR score for each Division I team is calculated by adding all points earned by the team and dividing that total by the maximum possible number of points that could have been earned. This percentage is then multiplied by 1,000 to return the team’s APR score. Thus, an APR of 950 means that the student-athletes in the cohort earned 95 percent of the eligibility and retention points that they could have earned.  It is important to note that APR in this dataset represents a four-year rolling average of APR scores.
+  The first dataset used is the online NCAA Academic Progress Rate Database. From this the variables of interest are the schools, the state each school is in, the various sports, the individual years, and each specific program's APR score.  Each athlete on the team can receive at most 2 points, one for remaining eligible over the semester and another for staying at the institution. So, each athlete can have anywhere between zero and two points for a given semester. The APR score for each Division I team is calculated by adding all points earned by the team and dividing that total by the maximum possible number of points that could have been earned. This percentage is then multiplied by 1,000 to return the team’s APR score. Thus, an APR of 950 means that the student-athletes in the cohort earned 95 percent of the eligibility and retention points that they could have earned.  It is important to note that APR in this dataset represents a four-year rolling average of APR scores.  Figure 1 (below) shows the variation in APR scores between sports and years.  Men's Basketball, Baseball, and Football all have lower APR scores on average from the other sports (plot (a)), where Men's and Women's Ice Hockey has higher APR scores on average. We can also see that over the 8-year time period in our data (plot (b)) APR scores on average have increased.
   
-```{r figure1,fig.align="center",out.width="80%",fig.cap= 'Figure 1: Boxplots of Multi-Year APR scores for each sport. Plot (a) is based on all 17,700 observations from all 2,168 programs over all years, while plot (b) uses only one observation per program', echo=FALSE, warning=FALSE}
+```{r figure1,fig.align="center",out.width="80%",fig.cap= 'Figure 1: Distribution and trend of Multi-Year APR scores. Plot (a) is based on all 17,700 observations from all 2,168 programs over all years separated by sport.  Plot (b) tracks the increasing trend of APR scores from the year 2010 to 2018.', echo=FALSE, warning=FALSE}
 box.sport <- ggplot(data=sports,aes(factor(Sport),Multi.Year.APR)) +
   geom_boxplot() + 
   theme.1 + coord_flip() + ylab("Multi-Year APR") + 
   xlab("") + labs(title="(a)")
 
-select_year <- sports %>% group_by(program.id, Sport) %>%
-  summarize(MeanAPR = mean(Multi.Year.APR))
+select_year <- sports %>% group_by(Start.Year) %>%
+  summarize(MeanAPR = mean(Multi.Year.APR, na.rm=TRUE))
 
-box.sport2 <- ggplot(data=select_year,aes(factor(Sport),MeanAPR)) +
-  geom_boxplot() + 
-  theme.1 + coord_flip() + ylab("Mean APR") + 
+box.sport2 <- ggplot(data=select_year,aes((Start.Year),MeanAPR)) +
+  geom_point() + 
+  geom_smooth(method=lm) +
+  theme.1 + ylab("Mean APR") + 
   xlab("") + labs(title="(b)")
 
 grid.arrange(box.sport, box.sport2, ncol = 1)
@@ -334,24 +343,28 @@ corrplot(Corr, type = "lower", order = "hclust",
          tl.col = "black", tl.srt = 45)
 ```
 
-  It is also important to explore the possibility of differences in location.  Perhaps programs in the Southwest have higher win percentages on average than programs in New England.  Figure 3 (below) demonstrates differences in win percentage for the different geographic regions.  Generally speaking, all regions have a median win percentage of roughly 50%. 
+  In the models used throughout our research, we will explore the effect inclusion of these correlated variables have to our results.  One area of concern arises when considering the inclusion of the percent white variable.  Although this variable is correlated with win percentage, it is also highly correlated with the APR scores and may cause an issue of multicollinearity; the two variables may not be independent from each other and the models cannot differentiate the effect of APR scores from the effect of the percentage of white students.  Multicollinearity can cause variations in coefficient estimates and in the significance of our results.  We will include models that include these variables, and models that do not to determine the effect multicollinearity may have based on the differences in our results.
+
+  It is also important to explore the possibility of differences in location.  Perhaps programs in the Southwest have higher win percentages on average than programs in New England.  Figure 3 (below) demonstrates differences in win percentage for the different geographic regions.  Generally speaking, all regions have a median win percentage of roughly 50%. Without major differences between regions, they may not contribute to our final results, but we will look at our models with and without a variable controlling for the geographic region and compare the estimates.
   
 ```{r figure3, fig.cap="Figure 3: The distribution of Win Percentages in different geographic locations"}
 LMRegion <- ggplot(sports, aes(x = Pct, as.factor(Region))) +
   geom_boxplot(method='lm', se = FALSE) + 
   theme.1 +
-  labs(x='Win Percentage', y='Geographic Region',title='The Difference in APR by Region')
+  labs(x='Win Percentage', y='Geographic Region')
 
 LMRegion
 ```
 
-  In the models used throughout our research, we will explore the effect inclusion of these correlated variables have to our results.  One area of concern arises when considering the inclusion of the percent white variable.  Although this variable is correlated with win percentage, it is also highly correlated with the APR scores and may cause an issue of multicollinearity; the two variables may not be independent from each other and the models cannot differentiate the effect of APR scores from the effect of the percentage of white students.  Multicollinearity can cause variations in coefficient estimates and in the significance of our results.  We will include models that include these variables, and models that do not to determine the effect multicollinearity may have based on the differences in our results.
-
-  To begin with we can look at an Ordinary Least Squares (OLS) regression of Multi-Year APR scores on Win Percentages.  Equation 1 below is the full equation used in our research to calculate the OLS regression coefficients.  $Y_i,_j,_k$ represents the Win Percentage of program $j$ at school $i$ in year $k$.  The $\beta_s$ in this model is the regression coefficient corresponding to each variable in the model.  $\epsilon_i,_j,_k$ then represents the error term capturing the unexplained variability in the model; the random differences within a specific program from year to year.
+  To begin with we can look at an Ordinary Least Squares (OLS) regression of Multi-Year APR scores on Win Percentages.  Equation 1 below is the full equation used in our research to calculate the OLS regression coefficients.  $Y_i,_j,_k$ represents the Win Percentage of program $j$ at school $i$ in year $k$.  The $\beta_s$ in this model is the regression coefficient corresponding to each variable in the model.  $\epsilon_i,_j,_k$ then represents the error term capturing the unexplained variability in the model; the random differences within a specific program from year to year.  Equation 1 is the standard OLS model for a baseline comparison using only APR scores to predict program's win percentage.  The second equation uses APR in addition to the strongly correlated variables from the College Scorecard Database.  Equation 3 depicts a model that also includes the variables that are only slightly correlated in addition to dummy variables for the different geographic regions.
   
-  $Equation 1: Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentWhite + \beta_4PercentCommunication_i + \beta_5NewEngland_i + \beta_6MidEast_i + \beta_7GreatLakes_i + \beta_8Plains_i + \beta_9SouthEast_i + \beta_10SouthWest_i + \beta_11RockyMountains_i + \beta_12FarWest_i + \beta_13Outlying_i + \epsilon_i,_j,_k$
+  Equation 1: $Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \epsilon_i,_j,_k$
+  
+  Equation 2: $Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentWhite + \epsilon_i,_j,_k$
+  
+  Equation 3: $Y_i,_j,_k = \alpha_0 +\beta_1APR_i,_j,_k + \beta_2Enrollment_i + \beta_3PercentWhite + \beta_4PercentMale + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + \epsilon_i,_j,_k$
 
-  However, the statistical modeling used in this research is a three-level mixed effects model.  We can compare our results to a traditional ordinary least squares (OLS) linear regression model however our data violates a vital assumption of OLS models: that all entries in the data are independent.  There are three levels in our model in which the entries have the potential to be correlated to one another: the school or institution level, the level containing each specific program, and the year level.  The key difference between an OLS model and a mixed effects model is the inclusion of random effects.  These random variables control for the random variability at each level in our model.
+  However, the statistical modeling used in this research is a three-level mixed effects model.  We can compare our results to a traditional ordinary least squares (OLS) linear regression model however our data violates a vital assumption of OLS models: that all entries in the data are independent.  There are three levels in our model in which the entries have the potential to be correlated to one another: the school or institution level, the level containing each athletic program, and the year level.  The key difference between an OLS model and a mixed effects model is the inclusion of random effects, variables that control for the random variability at each level in our model.
   
   The first level, the schools, are very important to consider.  Any entries from a specific college or university are going to be correlated with other entries from the same school.  For example, the win percentage of any program at the University of Michigan is going to be correlated with the win percentage at the University of Michigan in other entries, therefore not all entries are independent.  
   
