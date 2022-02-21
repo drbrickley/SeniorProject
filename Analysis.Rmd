@@ -1,7 +1,7 @@
 ---
-title: "Analysis"
+title: "The Effect of Academic Performance on Athletic Success in Collegiate Athletic Programs"
 author: "Derek Brickley"
-date: "1/26/2022"
+date: "2/25/2022"
 output: html_document
 ---
 
@@ -33,6 +33,7 @@ library(HLMdiag)
 library(pander)
 library(skimr)
 library(corrplot)
+library(sjPlot)
 ```
 
 ```{r}
@@ -112,15 +113,11 @@ year.apr.mean <- ggplot(data=year.lev2,aes(x=meanbyyear)) +
 ###  theme.1
 ```
 
-### $Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \epsilon_{ijk}$
-
 ```{r, results = 'hide'}
 OLSinitial = lm(Pct ~ centeredAPR, data = sports)
 
 (summary(OLSinitial))
 ```
-
-
 
 ```{r, results = 'hide'}
 OLSpartial = lm(Pct ~ centeredAPR + ugds + ugds_white, data = sports)
@@ -128,15 +125,11 @@ OLSpartial = lm(Pct ~ centeredAPR + ugds + ugds_white, data = sports)
 (summary(OLSpartial))
 ```
 
-### $Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_{i} + \beta_3PercentWhite_i + \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + \epsilon_{ijk}$
-
 ```{r, results = 'hide'}
 OLSfull = lm(Pct ~ centeredAPR + ugds + ugds_white + ugds_men + pcip09 + factor(Region), data = sports)
 
 (summary(OLSfull))
 ```
-
-$Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + s_i + p_{ij} + \epsilon_{ijk}$
 
 ```{r, results = 'hide'}
 partialintercept = lmer(Pct ~ centeredAPR + (1|School) + (1|program.id), REML=T, data=sports)
@@ -150,8 +143,6 @@ cat(" Number of Level Two groups = ",
 coef(summary(partialintercept))
 ```
 
-$Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + s_i + m_iAPR + p_{ij} + \epsilon_{ijk}$
-
 ```{r, results = 'hide'}
 partialschoolslope = lmer(Pct ~ centeredAPR + (centeredAPR|School) + (1|program.id), REML=T, data=sports)
 
@@ -164,9 +155,7 @@ cat(" Number of Level Two groups = ",
 coef(summary(partialschoolslope))
 ```
 
-$Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + s_i + p_{ij} + m_iAPR + \epsilon_{ijk}$
-
-```{r}
+```{r, results = 'hide'}
 baseprogramslope = lmer(Pct ~ centeredAPR + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
 
 VCrandom <- VarCorr(baseprogramslope)
@@ -178,9 +167,7 @@ cat(" Number of Level Two groups = ",
 coef(summary(baseprogramslope))
 ```
 
-$Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}$
-
-```{r}
+```{r, results = 'hide'}
 partialprogramslope = lmer(Pct ~ centeredAPR + ugds + ugds_white + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
 
 VCrandom <- VarCorr(partialprogramslope)
@@ -192,9 +179,7 @@ cat(" Number of Level Two groups = ",
 coef(summary(partialprogramslope))
 ```
 
-$Y_i,_j,_k = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_{i} + \beta_3PercentWhite_i + \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}$
-
-```{r}
+```{r, results = 'hide'}
 fullprogramslope = lmer(Pct ~ centeredAPR + ugds + ugds_white + ugds_men + pcip09 + factor(Region) + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
 
 VCrandom <- VarCorr(fullprogramslope)
@@ -205,8 +190,6 @@ cat(" Number of Level Two groups = ",
     summary(fullprogramslope)$ngrps[2])
 coef(summary(fullprogramslope))
 ```
-
-# The Effect of Academic Performance on Athletic Success in Collegiate Athletic Programs
 
 ## Introduction
 
@@ -226,7 +209,7 @@ kable(preview, booktabs=T,
     kable_styling(latex_options = "scale_down", font_size = 16) 
 ```
   
-  The first dataset used is the online NCAA Academic Progress Rate Database. From this the variables of interest are the schools, the state each school is in, the various sports, the individual years, and each specific program's APR score.  Each athlete on the team can receive at most 2 points, one for remaining eligible over the semester and another for staying at the institution. So, each athlete can have anywhere between zero and two points for a given semester. The APR score for each Division I team is calculated by adding all points earned by the team and dividing that total by the maximum possible number of points that could have been earned. This percentage is then multiplied by 1,000 to return the team’s APR score. Thus, an APR of 950 means that the student-athletes in the cohort earned 95 percent of the eligibility and retention points that they could have earned.  It is important to note that APR in this dataset represents a four-year rolling average of APR scores.  Figure 1 (below) shows the variation in APR scores between sports and years.  Men's Basketball, Baseball, and Football all have lower APR scores on average from the other sports (plot (a)), where Men's and Women's Ice Hockey has higher APR scores on average. We can also see that over the 8-year time period in our data (plot (b)) APR scores on average have increased.
+  The first dataset used is the NCAA Academic Progress Rate Database. From this the variables of interest are the schools, the state each school is in, the various sports, the individual years, and each specific program's APR score.  Each athlete on the team can receive at most 2 points, one for remaining eligible over the semester and another for staying at the institution. So, each athlete can have anywhere between zero and two points for a given semester. The APR score for each Division I team is calculated by adding all points earned by the team and dividing that total by the maximum possible number of points that could have been earned. This percentage is then multiplied by 1,000 to return the team’s APR score. Thus, an APR of 950 means that the student-athletes in the cohort earned 95 percent of the eligibility and retention points that they could have earned.  It is important to note that APR in this dataset represents a four-year rolling average of APR scores.  Figure 1 (below) shows the variation in APR scores between sports and years.  Men's Basketball, Baseball, and Football all have lower APR scores on average from the other sports (a), where Men's and Women's Ice Hockey has higher APR scores on average. We can also see that over the 8-year time period in our data (b) APR scores on average have increased.
   
 ```{r figure1,fig.align="center",out.width="80%",fig.cap= 'Figure 1: Distribution and trend of Multi-Year APR scores. Plot (a) is based on all 17,700 observations from all 2,168 programs over all years separated by sport.  Plot (b) tracks the increasing trend of APR scores from the year 2010 to 2018.', echo=FALSE, warning=FALSE}
 box.sport <- ggplot(data=sports,aes(factor(Sport),Multi.Year.APR)) +
@@ -270,7 +253,6 @@ kable(summary, booktabs=T,
 - 6	Southwest (AZ, NM, OK, TX)
 - 7	Rocky Mountains (CO, ID, MT, UT, WY)
 - 8	Far West (AK, CA, HI, NV, OR, WA)
-- 9	Outlying Areas (AS, FM, GU, MH, MP, PR, PW, VI)
     
     
 One other variable that needs to be considered is the percentage of the student body majoring in communication.  This is a very specific variable, but its potential inclusion in our data stems from the phenomenon of major clustering.  Programs and schools that cluster their student athletes into an easier, or less time-intensive major may have more energy to focus on athletics.  In addition, this may allow more student-athletes to remain eligible with a smaller work-load that some majors may offer.  Different institutions have been accused of clustering into different majors, but multiple of the accusations reinforce communications as one of the common majors subject to clustering.  As such we would expect that as the percentage of the student body majoring in communication increases we would see a corresponding increase in those programs' win percentages.  Kaydee McCormick found in their research that although clustering appears to have the possibility to occur among all college students, it seems to be more prevalent within intercollegiate athletics.  As such, if we find clustering in the general student-body it is reasonable to assume that the athletic programs at that institution are subject to clustering as well.  Although major clustering may be an issue in the data, there is no precise measurement of it, but this variable is our attempt to control for it.  For uniformity and ease of interpretation, all percentages were changed from a scale of 0.00 to 1.00 to a scale of 0 to 100.
@@ -279,12 +261,12 @@ One other variable that needs to be considered is the percentage of the student 
   
   The final institution level variable considered is the average cost of attendance.  Studies by Battle, Ayers et al., and Gurney analyze the relationship between academics and athletics considering the extreme burden and time commitments that student-athletes have. Regardless of their concluding argument, they rely on this connection. With such extenuating circumstances and limited time commitments, athletes do not have time and are often not allowed to work full-time and only in 2007 did the NCAA enact a policy allowing student athletes to work part-time jobs during the off-season. With that said, other than financial aid many student-athletes cannot be expected to afford the large tuition fee most institutions charge, not including student loans. Controlling for financial aid in this way adds value to the model by incorporating the affordability of different institutions, particularly for student-athletes who cannot, due to time restrictions, handle full-time employment.
   
-  In the merged dataset there were multiple of the included variables that needed to be modified.  The first of these was the variable for each Academic Year.  This variable was a strain that contained the two years (the start of the year and the end of the year) connected by a hyphen.  In order to model over time, it was necessary to convert the year variable to an integer.  The year used in this research is year from the start of the academic year.  For example, the year 2010 is the 2010-2011 academic year.  It was also important to rescale APR and years for later interpretation.  From the APR score a new variable was created to demonstrate the centered APR score, or each observation's distance from the mean APR score.  The year variable also needed to be centered; a new variable is created where the first year in the data, 2010, is represented as 0 and years are measured as years since 2010.  For example, the year 2018 would be represented as 8.  There was also a need to create a unique identifier variable for each program, i.e. a specific sport team at a specific institution.  
+  In the merged dataset there were multiple of the included variables that needed to be modified.  The first of these was the variable for each Academic Year.  This variable was a strain that contained the two years (the start of the year and the end of the year) connected by a hyphen.  In order to model over time, it was necessary to convert the year variable to an integer.  The year used in this research is year from the start of the academic year.  For example, the year 2010 is the 2010-2011 academic year.  It was also important to rescale APR and years for later interpretation.  From the APR score a new variable was created to demonstrate the centered APR score, or each observation's distance from the mean APR score of 974.4.  The year variable also needed to be centered; a new variable is created where the first year in the data, 2010, is represented as 0 and years are measured as years since 2010.  For example, the year 2018 would be represented as 8.  There was also a need to create a unique identifier variable for each program, i.e. a specific sport team at a specific institution.  
 
 
 ## Methodology
 
-  Our main purpose is to interpret how program's APR scores, measuring academic success, impact program's win percentages.  Using Ordinary Least Squares regression and multiple mixed-effects models, we can evaluate this relationship.  However, it is important to include variables in our models that impact a program's win percentage outside of APR scores.  By looking at each variable from the College Scorecard Database and its correlation with APR scores and win percentage we can see if it is valuable to the models.  Figure 2 (below) explores this correlation between each variable, where a darker red indicates a stronger, negative correlation and a darker blue indicates a stronger positive correlation.  On the diagonal we see the large dark blue circles, representing that each variable is perfectly correlated with itself.  Looking at the row and column for win percentage in Figure 2, we can see that APR Scores, the percent white, and the total student enrollment are the most correlated with win percentage, the percent communication and percent male have very small correlation, and the average cost and average age have essentially no correlation.  With no correlation, the average cost and average age of enrollment will not be included in the models as they add no value to our results.  In the models used throughout our research, we will explore the effect inclusion of these correlated variables have to our results.  We will include models that include these variables, and models that do not to determine the effect these controls may have based on the differences in our results.
+  Our main purpose is to interpret how program's APR scores, measuring academic success, impact program's win percentages.  Using Ordinary Least Squares regression and multiple mixed-effects models, we can evaluate this relationship.  However, it is important to include variables in our models that impact a program's win percentage outside of APR scores.  By looking at each variable from the College Scorecard Database and its correlation with APR scores and win percentage we can see if it is valuable to the models.  Figure 2 (below) explores this correlation between each variable, where a larger, darker red number indicates a stronger, negative correlation and a larger, darker blue number indicates a stronger positive correlation.  On the diagonal we see the dark blue number $1.00$, representing that each variable is perfectly correlated with itself.  Looking at the row and column for win percentage in Figure 2, we can see that APR Scores, the percent white, and the total student enrollment are the most correlated with win percentage, the percent communication and percent male have very small correlation, and the average cost and average age have essentially no correlation.  With no correlation, the average cost and average age of enrollment will not be included in the models as they add no value to our results.  We will include models that include these variables, and models that do not to determine the effect these controls may have based on the differences in our results.
   
 ```{r, fig.cap="Figure 2: The correlation between variables"}
 select_sports <- sports %>% select(Pct, centeredAPR, pcip09, ugds, ugds_men, ugds_white, costt4_a, age_entry) %>%
@@ -305,7 +287,7 @@ LMRegion <- ggplot(sports, aes(x = Pct, as.factor(Region))) +
 LMRegion
 ```
 
-  To begin with we can look at an Ordinary Least Squares (OLS) regression of Multi-Year APR scores on Win Percentages.  Model 1 below is the equation used in our research to calculate the OLS regression coefficients.  $Y_{ijk}$ represents the Win Percentage of program $j$ at school $i$ in year $k$.  The $\beta_s$ in this model is the regression coefficient corresponding to each variable in the model.  $\epsilon_{ijk}$ then represents the error term capturing the unexplained variability in the model; the random difference of everything from its expected value.  This error term is expected to be normally distributed where $\epsilon_{ijk} \sim N(0,\sigma^2)$  or in other words, everything deviates from its predicted win percentage randomly and independently.  Model 1 is the standard OLS model using only APR scores to predict program's win percentage.  The second equation uses APR in addition to the most  correlated variables from the College Scorecard Database.  Model 3 depicts a model that also includes the variables that are very slightly correlated in addition to dummy variables for the different geographic regions.
+  To begin with we can look at an Ordinary Least Squares (OLS) regression of Multi-Year APR scores on Win Percentages.  Model 1 below is the equation used in our research to calculate the OLS regression coefficients.  $Y_{ijk}$ represents the Win Percentage of program $j$ at school $i$ in year $k$.  The $\beta$ terms in this model are the regression coefficients corresponding to each variable in the model.  $\epsilon_{ijk}$ then represents the error term capturing the unexplained variability in the model; the random difference of everything from its expected value.  This error term is expected to be normally distributed where $\epsilon_{ijk} \sim N(0,\sigma^2)$  or in other words, everything deviates from its predicted win percentage randomly and independently.  Model 1 is the standard OLS model using only APR scores to predict program's win percentage.  The second model uses APR in addition to the most  correlated variables from the College Scorecard Database.  Model 3 depicts a model that also includes the variables that are very slightly correlated in addition to dummy variables for the different geographic regions.
   
   Model 1: $Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \epsilon_{ijk}$
   
@@ -313,7 +295,7 @@ LMRegion
   
   Model 3: $Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i + \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + \epsilon_{ijk}$
 
-  However, our data violates a vital assumption of OLS models: that all entries in the data are independent.  There are three levels in our model in which the entries have the potential to be correlated to one another: the school or institution level, the level containing each athletic program, and the year level.  The key difference between an OLS model and a mixed effects model is the inclusion of random effects, variables that control for the random variability within each level in our model.  The first level, the schools, are very important to consider.  Any entries from a specific college or university are going to be correlated with other entries from the same school.  For example, the win percentage of any program at the University of Michigan is going to be correlated with the win percentage at the University of Michigan in other entries, therefore not all entries are independent.  The second level in our model is the program level.  In this level it is important to take note that the win percentage of a specific program in one year is going to be correlated with other entries from the same program.  The University of Alabama historically has a very successful football program, and we can expect that the win percentage of the University of Alabama in 2010 is not independent from its win percentage in 2011.  The third and final level in this model is the year.  For this level we  need to consider that for any one program at any specific school, there will be random difference from year to year.
+  However, our data violates a vital assumption of OLS models: that all entries in the data are independent.  There are three levels in our model in which the entries have the potential to be correlated to one another: the school or institution level, the level containing each athletic program, and the year level.  The key difference between an OLS model and a mixed effects model is the inclusion of random effects, variables that control for the random variability within each level in our model.  The first level, the schools, are very important to consider.  Any entries from a specific college or university have the potential to be correlated with other entries from the same school.  For example, the win percentage of any program at the University of Michigan is going to be correlated with the win percentage at the University of Michigan in other entries, therefore not all entries are independent.  The second level in our model is the program level.  In this level it is important to take note that the win percentage of a specific program in one year is going to be correlated with other entries from the same program.  The University of Alabama historically has a very successful football program, and we can expect that the win percentage of the University of Alabama in 2010 is not completely independent from its win percentage in 2011.  The third and final level in this model is the year.  For this level we  need to consider that for any one program at any specific school, there will be random difference from year to year.
   
   When using a linear mixed effects model, there are both fixed effects and random effects.  In our models, the $\beta_s$ represent the fixed effects.  These variables will be constant over the program or school it represents.  In our mixed effect models the random effects, that vary over each program or school, will be represented by $s_i$, $p_{ij}$, $m_iAPR$, $m_{ij}APR$ and $\epsilon_i,_j,_k$.  
   
@@ -361,7 +343,7 @@ grid.arrange(diffslopeschool, diffslopeprogram, ncol = 1)
   
   Model 6: $Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}$
   
-When we add these random effects to the fixed effects in Model 1, we have 3 different base models.  Model 4 includes only intercept random effects, while Model 5 and 6 include slope random effects for schools and program respectively.  We can use likelihood ratio tests to compare our models.  In doing so, the models are refitted using full maximum likelihood, since we are focusing on model parameters and not random effects.  We can see the comparison in Table 3 (below).  In this case, the AIC  favors Model 6 (145425) over Model 5 (145538) and Model 4 (145615).  The BIC favors Model 6 as well (145480)  over Model 5 (145593) and Model 4 (145654).  The likelihood is largest and the log-likelihood is least negative under the model with the program slope random effect (Model 6).  We can conclude that Model 6 outperforms both Model 4 and Model 5.
+When we add these random effects to the fixed effects in Model 1, we have 3 different base models.  Model 4 includes only intercept random effects, while Model 5 and 6 include slope random effects for schools and programs respectively.  We can use likelihood ratio tests to compare our models.  In doing so, the models are refitted using full maximum likelihood, since we are focusing on model parameters and not random effects.  We can see the comparison in Table 3 (below).  In this case, the AIC  favors Model 6 (145425) over Model 5 (145538) and Model 4 (145615).  The BIC favors Model 6 as well (145480)  over Model 5 (145593) and Model 4 (145654).  The likelihood is largest and the log-likelihood is least negative under the model with the program slope random effect (Model 6).  We can conclude that Model 6 outperforms both Model 4 and Model 5.
 
 ```{r}
 `Model 4` <- partialintercept
@@ -391,14 +373,14 @@ Model 6.b: $Y_i,_j,_k = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_{i} + \be
 We can also further analyze model 6 to see if it can be improved by adding more fixed effects, other than APR Score, from the College Scorecard Database. Similar to models 2 and 3, the second equation uses APR in addition to the most correlated variables from the College Scorecard Database and Model 3 depicts a model that also includes the variables that are very slightly correlated in addition to dummy variables for the different geographic regions. 
 
 \begin{equation*}
-\textrm{Pseudo }R^2_{L1_s} = \frac{\hat{\sigma_s}^{2}(\textrm{Model 6})-\hat{\sigma_s}^{2}(\textrm{Model 6.a})}{\hat{\sigma_s}^{2}(\textrm{Model 6})} = \frac{41.21-24.95}{41.21} = 0.3946
+\textrm{Pseudo }R^2_{L3_s} = \frac{\hat{\sigma_s}^{2}(\textrm{Model 6})-\hat{\sigma_s}^{2}(\textrm{Model 6.a})}{\hat{\sigma_s}^{2}(\textrm{Model 6})} = \frac{41.21-24.95}{41.21} = 0.3946
 \end{equation*}
 
 \begin{equation*}
-\textrm{Pseudo }R^2_{L1_s} = \frac{\hat{\sigma_s}^{2}(\textrm{Model 6.a})-\hat{\sigma_s}^{2}(\textrm{Model 6.b})}{\hat{\sigma_s}^{2}(\textrm{Model 6.a})} = \frac{24.95-21.10}{24.95} = 0.1543
+\textrm{Pseudo }R^2_{L3_s} = \frac{\hat{\sigma_s}^{2}(\textrm{Model 6.a})-\hat{\sigma_s}^{2}(\textrm{Model 6.b})}{\hat{\sigma_s}^{2}(\textrm{Model 6.a})} = \frac{24.95-21.10}{24.95} = 0.1543
 \end{equation*}
 
-No variables are added at the yearly, or program level, so when adding College Scorecard variables to Model 6, there will be no change in program slope or intercept terms.  To analyze the addition of these variables to the model we can look at the $\textrm{Pseudo }R^2_{L1_s}$ which describes the improvement from model to model in explaining school-to-school variability in intercepts.  The addition of these variables at the school level has decreased the between-school variability in win percentage by 39.46% from model 6 to 6.a and an additional 15.43% from model 6.a to 6.b.  Using AIC and BIC tests in Table 4 (below), we see that AIC favors model 6.b, but BIC favors model 6.a due to the fact that BIC has a larger penalty for each additional variable and more model complexity.
+No variables are added at the yearly, or program level, so when adding College Scorecard variables to Model 6, there will be no change in program slope or intercept terms.  To analyze the addition of these variables to the model we can look at the $\textrm{Pseudo }R^2_{L3_s}$ which describes the improvement from model to model in explaining school-to-school variability in intercepts.  The addition of these variables at the school level has decreased the between-school variability in win percentage by 39.46% from model 6 to 6.a and an additional 15.43% from model 6.a to 6.b.  Using AIC and BIC tests in Table 4 (below), we see that AIC favors model 6.b, but BIC favors model 6.a due to the fact that BIC has a larger penalty for each additional variable and more model complexity.  Due to the improvement in models using $\textrm{Pseudo }R^2_{L3_s}$ and the slight favoritism of Model 6.b with AIC, Model 6.b is the final model that will be used throughout the remainder of our research.
 
 ```{r}
 `Model 6.a` <- partialprogramslope
@@ -414,12 +396,69 @@ kable(covariatecomp, booktabs=T,
       caption="Table 4: AIC and BIC Comparisons") %>%
     kable_styling(latex_options = "scale_down", font_size = 16)
 ```
-
-Due to the improvement in models using $\textrm{Pseudo }R^2_{L1_s}$ and the slight favoritism of model 6.b with AIC, model 6.b is the final model that will be used throughout the remainder of our research.  This three-level mixed effects model includes fixed effects for APR Score and all the variables that are slightly correlated in addition to dummy variables for the different geographic regions, and random effects for school-to-school variability, program-to-program variability, changes in rates of change from program to program, and an error term for unexplained year-to-year variability.
   
 ## Results
 
+As stated in the methodology section, Model 6.b (shown below) is the model that will be analyzed to draw our results.  This three-level mixed effects model includes fixed effects for APR Score and all the variables that are slightly correlated, dummy variables for the different geographic regions, and random effects for school-to-school variability, program-to-program variability, changes in rates of change from program to program, and an error term for unexplained year-to-year variability.
 
+Model 6.b: $Y_i,_j,_k = \alpha_0 + \beta_1APR_{ijk} + \beta_2Enrollment_{i} + \beta_3PercentWhite_i + \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}$
+
+From the model results shown in Table 5, a total 17,661 observations from 374 different schools and 2,168 different programs were used to estimate our model.  We can interpret our results as follows:
+
+Fixed Effects:
+
+- $\alpha_0 = 38.572 =$ the mean win percentage of an athletic program with a mean APR Score of 974.4, which is a centered APR score of 0.
+
+- $\beta_1 = 0.104 =$ the estimated increase in a program's win percentage for a 1 point increase in APR score after controlling for total enrollment, the percent white, the percent male, the percent communications majors, and the geographic region.  
+
+- $\beta_2 = 0.000267 =$ the estimated increase in win percentage for one more enrolled student at the school after controlling for APR score, the percent white, the percent male, the percent communications majors, and the geographic region.  A single student increase is not reasonable, so we can say that a 1,000 student increase in enrollment corresponds to 0.267 percentage point increase in win percentage.
+
+```{r}
+summary(`Model 6.b`)
+```
+
+- $\beta_3 = 0.118 =$ the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is white after controlling for APR score, total enrollment, the percent male, the percent communications majors, and the geographic region.  
+
+- $\beta_4 = 0.011 =$ the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is male after controlling for APR score, total enrollment, the percent white, the percent communications majors, and the geographic region. 
+
+- $\beta_5 = 0.226 =$ the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is majoring in communications or a related field after controlling for APR score, total enrollment, the percent white, the percent male, and the geographic region. 
+
+- ${\beta}_{6} = -3.744 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, and Vermont.
+
+- ${\beta}_{7} = -3.618 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Delaware, District of Columbia, Maryland, New Jersey, New York, and Pennsylvania.
+
+- ${\beta}_{8} = -3.528 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Illinois, Indiana, Michigan, Ohio, and Wisconsin.
+
+- ${\beta}_{9} = -0.444 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Iowa, Kansas, Minnesota, Missouri, Nevada, North Dakota, and South Dakota.
+
+- ${\beta}_{10} = 0.560 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Alabama, Arkansas, Florida, Georgia, Kentucky, Louisiana, Mississippi, North Carolina, South Carolina, Tennessee, Virginia, and West Virginia.
+
+- ${\beta}_{11} = 1.978 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Arizona, New Mexico, Oklahoma, and Texas.
+
+- ${\beta}_{12} = -1.894 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Colorado, Idaho, Montana, Utah, and Wyoming.
+
+- ${\beta}_{13} = -1.626 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Alaska, California, Hawaii, Nevada, Oregon, and Washington.
+
+Random Effects:
+
+- $\sigma = \sqrt167.146 = 12.929 =$ the standard deviation in within-program residuals from year-to-year after accounting for APR score, total enrollment, the percent white, the percent male, the percent communications majors, and the geographic region.  
+
+- $\sigma_p = \sqrt85.675 = 9.256 =$ the standard deviation of differences of each program's win percentage at a specific school relative to its expected win percentages based on APR score, total enrollment, the percent white, the percent male, the percent communications majors, and the geographic region.  
+
+- $\sigma_s = \sqrt21.102 = 4.954 =$ the standard deviation of differences of each school's win percentage relative to its expected win percentages based on APR score, total enrollment, the percent white, the percent male, the percent communications majors, and the geographic region.  
+
+- $\sigma_m = \sqrt0.052 = 0.228 =$ the standard deviation in rates of change in win percentage between programs over time.
+
+- $\rho_{01} = 0.145 =$ the correlation in programs’ APR score and their rate of change in win percentage.
+
+```{r}
+results <- tab_model(`Model 6.b`, show.se = TRUE, show.ci = FALSE, show.p = FALSE, show.stat = TRUE, show.icc = FALSE, show.r2 = FALSE, show.intercept = TRUE, pred.labels = c("Intercept", "Centered APR Score", "Total Enrollment", "Percent White", "Percent Male", "Percent Communication Majors", "New England", "Mid East", "Great Lakes", "Plains", "Southeast", "Southwest", "Rocky Mountains", "Far West"), dv.labels = ("Win Percentage"), string.stat = "T Statistic", string.se = "Std. Error", digits = 3, digits.re = 5, title = "Table 5: Mixed Effects Model 6.b Results")
+results
+```
+
+Based on T-values produced by Model 6.b, APR scores have the most significant effect on a program's win percentage.  As stated above, on average a 1 point increase in APR score corresponds to a 0.104 percentage point increase in win percentage after controlling for all other factors.  However, a 1 point increase is not a reasonable scale when the range of APR scores in our dataset are from 451 to 1,000.  Instead we can interpret this by saying a 10 point increase in APR score is associated with a 1.04 percentage point increase in a program's win percentage, and a 100 point increase corresponds to a 10.4 percentage point increase in win percentage.  A 100 point difference in APR score is therefore equivalent to roughly winning 1 more game out of every 10 games.  
+
+Controlling for school level variables provided more reliable estimates of the effects of APR scores, while also providing interesting insights.  For example, schools with larger enrollment and schools with a larger percent of the student body being white had higher win percentages on average.  In addition, the inclusion of random effects in our model makes our variance and standard deviation estimates more precise.  However, it is still important to note that the largest amount of deviation occurs from year-to-year within programs rather than from school-to-school or program-to-program within school.  
 
 ## Conclusion
 
