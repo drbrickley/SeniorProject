@@ -413,10 +413,6 @@ Fixed Effects:
 
 - $\beta_2 = 0.000267 =$ the estimated increase in win percentage for one more enrolled student at the school after controlling for APR score, the percent white, the percent male, the percent communications majors, and the geographic region.  A single student increase is not reasonable, so we can say that a 1,000 student increase in enrollment corresponds to 0.267 percentage point increase in win percentage.
 
-```{r}
-summary(`Model 6.b`)
-```
-
 - $\beta_3 = 0.118 =$ the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is white after controlling for APR score, total enrollment, the percent male, the percent communications majors, and the geographic region.  
 
 - $\beta_4 = 0.011 =$ the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is male after controlling for APR score, total enrollment, the percent white, the percent communications majors, and the geographic region. 
