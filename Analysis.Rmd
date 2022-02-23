@@ -234,7 +234,7 @@ grid.arrange(box.sport, box.sport2, ncol = 1)
   
   The final data accessed is the College Scorecard data.  This database provides information about each specific institution not specific to athletics.  Each observation has the school's ID number and the name of the school.  For each school in each year the variables that were considered for their relevance are the geographic region of the school, the percentage of degrees awarded in Communication, Journalism, And Related Programs, the total enrollment, the percent of the student body that is white, the percent of the student body that is male, the average cost of attendance in each year, and the age at which students enroll at the institution.  As with any form of modeling it is important to hold constant variables that may bias results and affect their validity.  The College Scorecard data is used to include school-level variables and to determine what aspects of a school would have an effect on its sports' win percentages.  
   
-```{r table2, echo=FALSE, warning=FALSE}
+```{r table2, echo=FALSE, out.width = "60%", warning=FALSE}
 summarydata <- sports %>% select(School, "School ID" = School_ID, Region, "Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Program ID" = program.id, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
 
 summary <- summary(summarydata)
@@ -461,17 +461,15 @@ Controlling for school level variables provided more reliable estimates of the e
 
 Transitioning from the biased OLS model and comparing various mixed effects models using AIC, BIC, and likelihood ratio tests allow our final model to yield the most accurate results.  Using our final mixed effects model of 2,168 different programs over 8 years, we see the direct positive relationship between academic success, measured through APR scores, and program's win percentage, a measure of athletic performance.  Of the numerous covariate factors included in this model, academics have the most significant effect on athletics.  The NCAA and all college coaches and recruiters for team sports should be looking not just for the best athletes, but for the best student-athletes.  In addition, the NCAA and college programs should seek to provide incentives to programs with higher academic performance, as it will benefit the competition at the college-level and create better students, better athletes, and in general people who are better prepared for their life after college.
 
-## References
+This significant finding is intuitively the results we expected to find in our research.  The mentality of hard-working students is directly reflected in their athletic preparation and performance.  Future research on the relationship between academics and athletics could look at the relationship for non-team related sports, such as track and field or swimming. This relationship could also be viewed at different levels of competition, perhaps at the high school, or NCAA Division 2 or Division 3 level.  
 
-Academic Progress Rate, NCAA, https://web3.ncaa.org/aprsearch/aprsearch. 
+## References
 
 “Age, Gender, Ethnicity, Religion and Culture and Sport - Social Groupings and Participation in Sport - OCR - GCSE Physical Education Revision - OCR - BBC Bitesize.” BBC News, BBC, https://www.bbc.co.uk/bitesize/guides/zy62hv4/revision/2. 
 
 Ayers, Kevin, Monica Pazmino-Cevallos, and Cody Dobose. "The 20-hour rule: Student-athletes time commitment to athletics and academics." Vahperd Journal 33.1 (2012): 22-27.
 
 Battle, Johné Everett. The Talent Factory: A Study of Grit, Mindset, and Student-Athletes. Diss. University of Pennsylvania, 2020
-
-“Data Documentation.” Documentation | College Scorecard, https://collegescorecard.ed.gov/data/documentation/. 
 
 Gurney, Gerald S. "Now we must reform athletics reform." The Chronicle of Higher Education 56.9 (2009): A34
 
@@ -481,8 +479,6 @@ Legler, Julie, and Paul Roback. “Beyond Multiple Linear Regression.” Beyond 
 
 McCormick, Kaydee K. “Academic Clustering in Intercollegiate Athletics.” Kansas State University, 1 Jan. 1970, https://krex.k-state.edu/dspace/handle/2097/4129. 
 
-NCAA Statistics, NCAA, https://stats.ncaa.org/rankings/change_sport_year_div. 
-
 Oskolkov, Nikolay. “Maximum Likelihood (ML) vs. REML.” Medium, Towards Data Science, 9 Sept. 2020, https://towardsdatascience.com/maximum-likelihood-ml-vs-reml-78cf79bef2cf. 
 
 “PROFESSIONAL ATHLETE Demographics And Statistics In The US.” Zippia, https://www.zippia.com/professional-athlete-jobs/demographics/. 
@@ -490,3 +486,11 @@ Oskolkov, Nikolay. “Maximum Likelihood (ML) vs. REML.” Medium, Towards Data 
 Schneider, Ray G., et al. “Academic Clustering and Major Selection of Intercollegiate Student-Athletes.” College Student Journal, vol. 44, no. 1, Mar. 2010, pp. 64–70. EBSCOhost, search.ebscohost.com/login.aspx?direct=true&db=aqh&AN=48646428&site=eds-live.
 
 Song, Minyong, and Yang Zhang. “Research on the Relationship between Geographical Factors, Sports and Culture.” Advances in Physical Education, vol. 08, no. 01, Feb. 2018, pp. 66–70., https://doi.org/10.4236/ape.2018.81008. 
+
+### Data Sources
+
+Academic Progress Rate, NCAA, https://web3.ncaa.org/aprsearch/aprsearch. 
+
+“Data Documentation.” Documentation | College Scorecard, https://collegescorecard.ed.gov/data/documentation/. 
+
+NCAA Statistics, NCAA, https://stats.ncaa.org/rankings/change_sport_year_div. 
