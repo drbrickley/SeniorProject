@@ -173,11 +173,6 @@ pre code {
 </div>
 
 
-<style type="text/css">
-  body{
-  font-size: 16pt;
-}
-</style>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Across the country, there are more than 500,000 college athletes competing for 1,100 different schools in the National Collegiate Athletics Association (NCAA). These athletes attend their institution not just to play their respective sport and succeed athletically, but also to pursue a degree and achieve their academic goals. With college sports being over a $18 billion business, why would the NCAA and college programs emphasize the importance of academics when the NCAA and athletics do not benefit. After all, coaches scout high school athletes nationwide looking for the best talent to bring into their individual programs. However, in addition to improving the athletes’ life after their athletic career, academics may also improve success within athletic programs. By using a mixed effect model, we can look at how success in the classroom is related to how a team performs. In my analysis I will look at Division 1 programs’ Academic Progress Rate (APR), measuring the eligibility and retention of athletes, and win percentage from nine different sports from 2010 to 2018.</p>
@@ -185,279 +180,268 @@ pre code {
 </div>
 <div id="data" class="section level2">
 <h2>Data</h2>
-<p>The data in this research merged two datasets from the NCAA and data from the College Scorecard. The resulting dataframe is panel data that contains data from 394 schools and nine different sports over eight years. This study focuses only on Division 1 team sports and the relationship between team academic performance and that team’s athletic success. Specifically this data was filtered to focus on nine team sports: Men’s Soccer, Women’s Soccer, Baseball, Softball, Men’s Basketball, Women’s Basketball, Football, Men’s Ice Hockey, and Women’s Ice Hockey. In total there are 17,700 observations with 17 variables. Table 1 (below) shows the first five rows of the data and the 14 main variables that are important to this research, excluding shifted variables for year and APR score and the specific state of the school.</p>
-<table class="table" style="font-size: 16px; margin-left: auto; margin-right: auto;">
-<caption style="font-size: initial !important;">
-Table 1: A snapshot of selected variables from the first five observations in the academics and athletics combined dataset.
+<p>The data in this research merged two datasets from the NCAA and data from the College Scorecard. The resulting dataframe is panel data that contains data from 394 schools and nine different sports over eight years. This study focuses only on Division 1 team sports and the relationship between team academic performance and that team’s athletic success. Specifically this data was filtered to focus on nine team sports: Men’s Soccer, Women’s Soccer, Baseball, Softball, Men’s Basketball, Women’s Basketball, Football, Men’s Ice Hockey, and Women’s Ice Hockey. In total there are 17,700 observations with 17 variables. Table 1 (below) shows the first five rows of the data and the 12 main variables that are important to this research, excluding ID numbers, shifted variables for year and APR score and the specific state of the school.</p>
+<table style="text-align:center">
+<caption>
+<strong>Table 1: Selected variables from the first five observations in the dataset.</strong>
 </caption>
-<thead>
 <tr>
-<th style="text-align:left;">
-School
-</th>
-<th style="text-align:right;">
-School ID
-</th>
-<th style="text-align:right;">
-Region
-</th>
-<th style="text-align:right;">
-Percent Communication Major
-</th>
-<th style="text-align:right;">
-Total Enrollment
-</th>
-<th style="text-align:right;">
-Percent Male
-</th>
-<th style="text-align:right;">
-Percent White
-</th>
-<th style="text-align:right;">
-Average Cost of Attendance
-</th>
-<th style="text-align:right;">
-Average Age at Enrollment
-</th>
-<th style="text-align:left;">
-Sport
-</th>
-<th style="text-align:right;">
-Program ID
-</th>
-<th style="text-align:right;">
-Win Percentage
-</th>
-<th style="text-align:right;">
-Multi-Year APR
-</th>
-<th style="text-align:right;">
-Year
-</th>
+<td colspan="13" style="border-bottom: 1px solid black">
+</td>
 </tr>
-</thead>
-<tbody>
 <tr>
-<td style="text-align:left;">
+<td style="text-align:left">
+</td>
+<td>
+School
+</td>
+<td>
+Region
+</td>
+<td>
+Percent Communication Major
+</td>
+<td>
+Total Enrollment
+</td>
+<td>
+Percent Male
+</td>
+<td>
+Percent White
+</td>
+<td>
+Average Cost of Attendance
+</td>
+<td>
+Average Age at Enrollment
+</td>
+<td>
+Sport
+</td>
+<td>
+Win Percentage
+</td>
+<td>
+Multi-Year APR
+</td>
+<td>
+Year
+</td>
+</tr>
+<tr>
+<td colspan="13" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+1
+</td>
+<td>
 University of Virginia
 </td>
-<td style="text-align:right;">
-234076
-</td>
-<td style="text-align:right;">
+<td>
 5
 </td>
-<td style="text-align:right;">
-0.00
+<td>
+0
 </td>
-<td style="text-align:right;">
-14232
+<td>
+14,232
 </td>
-<td style="text-align:right;">
-44.33
+<td>
+44.330
 </td>
-<td style="text-align:right;">
-59.84
+<td>
+59.840
 </td>
-<td style="text-align:right;">
-21142
+<td>
+21,142
 </td>
-<td style="text-align:right;">
+<td>
 20
 </td>
-<td style="text-align:left;">
+<td>
 Baseball
 </td>
-<td style="text-align:right;">
-1972
+<td>
+82.400
 </td>
-<td style="text-align:right;">
-82.4
-</td>
-<td style="text-align:right;">
+<td>
 986
 </td>
-<td style="text-align:right;">
-2010
+<td>
+2,010
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-Vanderbilt University
-</td>
-<td style="text-align:right;">
-221999
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-2.91
-</td>
-<td style="text-align:right;">
-6836
-</td>
-<td style="text-align:right;">
-48.96
-</td>
-<td style="text-align:right;">
-63.91
-</td>
-<td style="text-align:right;">
-54718
-</td>
-<td style="text-align:right;">
-19
-</td>
-<td style="text-align:left;">
-Baseball
-</td>
-<td style="text-align:right;">
-2038
-</td>
-<td style="text-align:right;">
-81.8
-</td>
-<td style="text-align:right;">
-996
-</td>
-<td style="text-align:right;">
-2010
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-University of South Carolina, Columbia
-</td>
-<td style="text-align:right;">
-218663
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-7.29
-</td>
-<td style="text-align:right;">
-21033
-</td>
-<td style="text-align:right;">
-46.53
-</td>
-<td style="text-align:right;">
-78.23
-</td>
-<td style="text-align:right;">
-21490
-</td>
-<td style="text-align:right;">
-21
-</td>
-<td style="text-align:left;">
-Baseball
-</td>
-<td style="text-align:right;">
-1892
-</td>
-<td style="text-align:right;">
-79.7
-</td>
-<td style="text-align:right;">
-953
-</td>
-<td style="text-align:right;">
-2010
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Stony Brook University
-</td>
-<td style="text-align:right;">
-196097
-</td>
-<td style="text-align:right;">
+<td style="text-align:left">
 2
 </td>
-<td style="text-align:right;">
-0.88
+<td>
+Vanderbilt University
 </td>
-<td style="text-align:right;">
-16044
+<td>
+5
 </td>
-<td style="text-align:right;">
-52.50
+<td>
+2.910
 </td>
-<td style="text-align:right;">
-38.23
+<td>
+6,836
 </td>
-<td style="text-align:right;">
-18319
+<td>
+48.960
 </td>
-<td style="text-align:right;">
-21
+<td>
+63.910
 </td>
-<td style="text-align:left;">
+<td>
+54,718
+</td>
+<td>
+19
+</td>
+<td>
 Baseball
 </td>
-<td style="text-align:right;">
-1253
+<td>
+81.800
 </td>
-<td style="text-align:right;">
-77.8
+<td>
+996
 </td>
-<td style="text-align:right;">
-959
-</td>
-<td style="text-align:right;">
-2010
+<td>
+2,010
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-University of North Carolina, Chapel Hill
+<td style="text-align:left">
+3
 </td>
-<td style="text-align:right;">
-199120
+<td>
+University of South Carolina, Columbia
 </td>
-<td style="text-align:right;">
+<td>
 5
 </td>
-<td style="text-align:right;">
-14.86
+<td>
+7.290
 </td>
-<td style="text-align:right;">
-17943
+<td>
+21,033
 </td>
-<td style="text-align:right;">
-40.98
+<td>
+46.530
 </td>
-<td style="text-align:right;">
-66.14
+<td>
+78.230
 </td>
-<td style="text-align:right;">
-17777
+<td>
+21,490
 </td>
-<td style="text-align:right;">
-20
+<td>
+21
 </td>
-<td style="text-align:left;">
+<td>
 Baseball
 </td>
-<td style="text-align:right;">
-1782
+<td>
+79.700
 </td>
-<td style="text-align:right;">
-76.1
+<td>
+953
 </td>
-<td style="text-align:right;">
-969
-</td>
-<td style="text-align:right;">
-2010
+<td>
+2,010
 </td>
 </tr>
-</tbody>
+<tr>
+<td style="text-align:left">
+4
+</td>
+<td>
+Stony Brook University
+</td>
+<td>
+2
+</td>
+<td>
+0.880
+</td>
+<td>
+16,044
+</td>
+<td>
+52.500
+</td>
+<td>
+38.230
+</td>
+<td>
+18,319
+</td>
+<td>
+21
+</td>
+<td>
+Baseball
+</td>
+<td>
+77.800
+</td>
+<td>
+959
+</td>
+<td>
+2,010
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+5
+</td>
+<td>
+University of North Carolina, Chapel Hill
+</td>
+<td>
+5
+</td>
+<td>
+14.860
+</td>
+<td>
+17,943
+</td>
+<td>
+40.980
+</td>
+<td>
+66.140
+</td>
+<td>
+17,777
+</td>
+<td>
+20
+</td>
+<td>
+Baseball
+</td>
+<td>
+76.100
+</td>
+<td>
+969
+</td>
+<td>
+2,010
+</td>
+</tr>
+<tr>
+<td colspan="13" style="border-bottom: 1px solid black">
+</td>
+</tr>
 </table>
 <p>The first dataset used is the NCAA Academic Progress Rate Database. From this the variables of interest are the schools, the state each school is in, the various sports, the individual years, and each specific program’s APR score. Each athlete on the team can receive at most 2 points, one for remaining eligible over the semester and another for staying at the institution. So, each athlete can have anywhere between zero and two points for a given semester. The APR score for each Division I team is calculated by adding all points earned by the team and dividing that total by the maximum possible number of points that could have been earned. This percentage is then multiplied by 1,000 to return the team’s APR score. Thus, an APR of 950 means that the student-athletes in the cohort earned 95 percent of the eligibility and retention points that they could have earned. It is important to note that APR in this dataset represents a four-year rolling average of APR scores. Figure 1 (below) shows the variation in APR scores between sports and years. Men’s Basketball, Baseball, and Football all have lower APR scores on average from the other sports (a), where Men’s and Women’s Ice Hockey has higher APR scores on average. We can also see that over the 8-year time period in our data (b) APR scores on average have increased.</p>
 <div class="figure" style="text-align: center">
@@ -468,382 +452,308 @@ Figure 1: Distribution and trend of Multi-Year APR scores. Plot (a) is based on 
 </div>
 <p>The second NCAA dataset is a combination of datasets of the nine different team sports and their athletic performance in each year from 2010-2018. The important variables from this database are the team name, the team’s win percentage, and the year of observation. With each dataset, it was necessary to create a new variable for the sport to keep track of which program is being observed when all datasets are merged together. In some cases, the individual sports reported win percentage differently than others. Multiple sports reported win percentage as a percentage with range from 0 to 100, while other sports reported it as a decimal 0.00 to 1.00. For uniformity and ease of interpretation, all percentages were changed to a scale of 0 to 100.</p>
 <p>The final data accessed is the College Scorecard data. This database provides information about each specific institution not specific to athletics. Each observation has the school’s ID number and the name of the school. For each school in each year the variables that were considered for their relevance are the geographic region of the school, the percentage of degrees awarded in Communication, Journalism, And Related Programs, the total enrollment, the percent of the student body that is white, the percent of the student body that is male, the average cost of attendance in each year, and the age at which students enroll at the institution. As with any form of modeling it is important to hold constant variables that may bias results and affect their validity. The College Scorecard data is used to include school-level variables and to determine what aspects of a school would have an effect on its sports’ win percentages.</p>
-<table class="table" style="font-size: 16px; margin-left: auto; margin-right: auto;">
-<caption style="font-size: initial !important;">
-Table 2: Summary Statistics of the combined datasets.
+<table style="text-align:center">
+<caption>
+<strong>Table 2: Summary Statistics</strong>
 </caption>
-<thead>
 <tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:left;">
-School
-</th>
-<th style="text-align:left;">
-School ID
-</th>
-<th style="text-align:left;">
-Region
-</th>
-<th style="text-align:left;">
+<td colspan="8" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Statistic
+</td>
+<td>
+Mean
+</td>
+<td>
+St. Dev.
+</td>
+<td>
+Min
+</td>
+<td>
+Pctl(25)
+</td>
+<td>
+Median
+</td>
+<td>
+Pctl(75)
+</td>
+<td>
+Max
+</td>
+</tr>
+<tr>
+<td colspan="8" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
 Percent Communication Major
-</th>
-<th style="text-align:left;">
+</td>
+<td>
+5.440
+</td>
+<td>
+3.979
+</td>
+<td>
+0.000
+</td>
+<td>
+2.750
+</td>
+<td>
+4.940
+</td>
+<td>
+7.680
+</td>
+<td>
+23.330
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
 Total Enrollment
-</th>
-<th style="text-align:left;">
+</td>
+<td>
+13,404.330
+</td>
+<td>
+10,200.840
+</td>
+<td>
+947.000
+</td>
+<td>
+5,099.250
+</td>
+<td>
+10,173.000
+</td>
+<td>
+19,606.000
+</td>
+<td>
+59,183.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
 Percent Male
-</th>
-<th style="text-align:left;">
+</td>
+<td>
+45.973
+</td>
+<td>
+7.892
+</td>
+<td>
+0.000
+</td>
+<td>
+41.630
+</td>
+<td>
+45.590
+</td>
+<td>
+49.750
+</td>
+<td>
+93.250
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
 Percent White
-</th>
-<th style="text-align:left;">
+</td>
+<td>
+58.820
+</td>
+<td>
+21.759
+</td>
+<td>
+0.010
+</td>
+<td>
+47.970
+</td>
+<td>
+64.610
+</td>
+<td>
+75.200
+</td>
+<td>
+92.810
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
 Average Cost of Attendance
-</th>
-<th style="text-align:left;">
+</td>
+<td>
+32,295.150
+</td>
+<td>
+15,948.960
+</td>
+<td>
+10,605.000
+</td>
+<td>
+19,988.000
+</td>
+<td>
+24,441.000
+</td>
+<td>
+46,143.000
+</td>
+<td>
+72,960.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
 Average Age at Enrollment
-</th>
-<th style="text-align:left;">
-Sport
-</th>
-<th style="text-align:left;">
-Program ID
-</th>
-<th style="text-align:left;">
+</td>
+<td>
+21.154
+</td>
+<td>
+1.695
+</td>
+<td>
+19.000
+</td>
+<td>
+20.000
+</td>
+<td>
+21.000
+</td>
+<td>
+22.000
+</td>
+<td>
+32.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Region
+</td>
+<td>
+4.247
+</td>
+<td>
+2.066
+</td>
+<td>
+0
+</td>
+<td>
+2
+</td>
+<td>
+5
+</td>
+<td>
+5
+</td>
+<td>
+8
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
 Win Percentage
-</th>
-<th style="text-align:left;">
+</td>
+<td>
+50.081
+</td>
+<td>
+17.740
+</td>
+<td>
+0.000
+</td>
+<td>
+38.000
+</td>
+<td>
+50.000
+</td>
+<td>
+62.500
+</td>
+<td>
+100.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
 Multi-Year APR
-</th>
-<th style="text-align:left;">
+</td>
+<td>
+974.404
+</td>
+<td>
+22.782
+</td>
+<td>
+451.000
+</td>
+<td>
+963.000
+</td>
+<td>
+979.000
+</td>
+<td>
+990.000
+</td>
+<td>
+1,000.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
 Year
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
 </td>
-<td style="text-align:left;">
-Length:17700
+<td>
+2,014.252
 </td>
-<td style="text-align:left;">
-Min. :100654
+<td>
+2.524
 </td>
-<td style="text-align:left;">
-Min. :0.000
+<td>
+2,010
 </td>
-<td style="text-align:left;">
-Min. : 0.00
+<td>
+2,012
 </td>
-<td style="text-align:left;">
-Min. : 947
+<td>
+2,014
 </td>
-<td style="text-align:left;">
-Min. : 0.00
+<td>
+2,016
 </td>
-<td style="text-align:left;">
-Min. : 0.01
-</td>
-<td style="text-align:left;">
-Min. :10605
-</td>
-<td style="text-align:left;">
-Min. :19.00
-</td>
-<td style="text-align:left;">
-Length:17700
-</td>
-<td style="text-align:left;">
-Min. : 1
-</td>
-<td style="text-align:left;">
-Min. : 0.00
-</td>
-<td style="text-align:left;">
-Min. : 451.0
-</td>
-<td style="text-align:left;">
-Min. :2010
+<td>
+2,018
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Class :character
-</td>
-<td style="text-align:left;">
-1st Qu.:146719
-</td>
-<td style="text-align:left;">
-1st Qu.:2.000
-</td>
-<td style="text-align:left;">
-1st Qu.: 2.75
-</td>
-<td style="text-align:left;">
-1st Qu.: 5099
-</td>
-<td style="text-align:left;">
-1st Qu.:41.63
-</td>
-<td style="text-align:left;">
-1st Qu.:47.97
-</td>
-<td style="text-align:left;">
-1st Qu.:19988
-</td>
-<td style="text-align:left;">
-1st Qu.:20.00
-</td>
-<td style="text-align:left;">
-Class :character
-</td>
-<td style="text-align:left;">
-1st Qu.: 546
-</td>
-<td style="text-align:left;">
-1st Qu.: 38.00
-</td>
-<td style="text-align:left;">
-1st Qu.: 963.0
-</td>
-<td style="text-align:left;">
-1st Qu.:2012
+<td colspan="8" style="border-bottom: 1px solid black">
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-Mode :character
-</td>
-<td style="text-align:left;">
-Median :184603
-</td>
-<td style="text-align:left;">
-Median :5.000
-</td>
-<td style="text-align:left;">
-Median : 4.94
-</td>
-<td style="text-align:left;">
-Median :10173
-</td>
-<td style="text-align:left;">
-Median :45.59
-</td>
-<td style="text-align:left;">
-Median :64.61
-</td>
-<td style="text-align:left;">
-Median :24441
-</td>
-<td style="text-align:left;">
-Median :21.00
-</td>
-<td style="text-align:left;">
-Mode :character
-</td>
-<td style="text-align:left;">
-Median :1086
-</td>
-<td style="text-align:left;">
-Median : 50.00
-</td>
-<td style="text-align:left;">
-Median : 979.0
-</td>
-<td style="text-align:left;">
-Median :2014
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-Mean :180050
-</td>
-<td style="text-align:left;">
-Mean :4.247
-</td>
-<td style="text-align:left;">
-Mean : 5.44
-</td>
-<td style="text-align:left;">
-Mean :13404
-</td>
-<td style="text-align:left;">
-Mean :45.97
-</td>
-<td style="text-align:left;">
-Mean :58.82
-</td>
-<td style="text-align:left;">
-Mean :32295
-</td>
-<td style="text-align:left;">
-Mean :21.15
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-Mean :1085
-</td>
-<td style="text-align:left;">
-Mean : 50.08
-</td>
-<td style="text-align:left;">
-Mean : 974.4
-</td>
-<td style="text-align:left;">
-Mean :2014
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-3rd Qu.:215743
-</td>
-<td style="text-align:left;">
-3rd Qu.:5.000
-</td>
-<td style="text-align:left;">
-3rd Qu.: 7.68
-</td>
-<td style="text-align:left;">
-3rd Qu.:19606
-</td>
-<td style="text-align:left;">
-3rd Qu.:49.75
-</td>
-<td style="text-align:left;">
-3rd Qu.:75.20
-</td>
-<td style="text-align:left;">
-3rd Qu.:46143
-</td>
-<td style="text-align:left;">
-3rd Qu.:22.00
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-3rd Qu.:1621
-</td>
-<td style="text-align:left;">
-3rd Qu.: 62.50
-</td>
-<td style="text-align:left;">
-3rd Qu.: 990.0
-</td>
-<td style="text-align:left;">
-3rd Qu.:2016
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-Max. :486840
-</td>
-<td style="text-align:left;">
-Max. :8.000
-</td>
-<td style="text-align:left;">
-Max. :23.33
-</td>
-<td style="text-align:left;">
-Max. :59183
-</td>
-<td style="text-align:left;">
-Max. :93.25
-</td>
-<td style="text-align:left;">
-Max. :92.81
-</td>
-<td style="text-align:left;">
-Max. :72960
-</td>
-<td style="text-align:left;">
-Max. :32.00
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-Max. :2168
-</td>
-<td style="text-align:left;">
-Max. :100.00
-</td>
-<td style="text-align:left;">
-Max. :1000.0
-</td>
-<td style="text-align:left;">
-Max. :2018
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA’s :24
-</td>
-<td style="text-align:left;">
-NA’s :24
-</td>
-<td style="text-align:left;">
-NA’s :24
-</td>
-<td style="text-align:left;">
-NA’s :24
-</td>
-<td style="text-align:left;">
-NA’s :196
-</td>
-<td style="text-align:left;">
-NA’s :4467
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA’s :15
-</td>
-<td style="text-align:left;">
-NA
-</td>
-</tr>
-</tbody>
 </table>
 <p>The first variable that was considered for its relevance was geographic region. In Minyong Song and Yang Zhang’s Study, <em>Research on the Relationship between Geographical Factors, Sports and Culture</em>, they conclude that “The geographical environment influences the emergence and development of sports events in different ways, Climate changes will affect the conditions of sports, but also interfere with the athletes’ body mechanism and emotion, thereby affecting athletic ability.” Their findings give merit to consider geographic region as a possible influence on win percentage. The breakdown that follows is the classification of the geographic regions:</p>
 <ul>
@@ -881,7 +791,16 @@ Figure 3: The distribution of Win Percentages in different geographic locations
 <p>To begin with we can look at an Ordinary Least Squares (OLS) regression of Multi-Year APR scores on Win Percentages. Model 1 below is the equation used in our research to calculate the OLS regression coefficients. <span class="math inline">\(Y_{ijk}\)</span> represents the Win Percentage of program <span class="math inline">\(j\)</span> at school <span class="math inline">\(i\)</span> in year <span class="math inline">\(k\)</span>. The <span class="math inline">\(\beta\)</span> terms in this model are the regression coefficients corresponding to each variable in the model. <span class="math inline">\(\epsilon_{ijk}\)</span> then represents the error term capturing the unexplained variability in the model; the random difference of everything from its expected value. This error term is expected to be normally distributed where <span class="math inline">\(\epsilon_{ijk} \sim N(0,\sigma^2)\)</span> or in other words, everything deviates from its predicted win percentage randomly and independently. Model 1 is the standard OLS model using only APR scores to predict program’s win percentage. The second model uses APR in addition to the most correlated variables from the College Scorecard Database. Model 3 depicts a model that also includes the variables that are very slightly correlated in addition to dummy variables for the different geographic regions.</p>
 <p>Model 1: <span class="math inline">\(Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \epsilon_{ijk}\)</span></p>
 <p>Model 2: <span class="math inline">\(Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i + \epsilon_{ijk}\)</span></p>
-<p>Model 3: <span class="math inline">\(Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i + \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + \epsilon_{ijk}\)</span></p>
+<p>Model 3:</p>
+<p><span class="math display">\[
+\begin{aligned}
+Y_{ijk} = &amp;\alpha_0 + \beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i 
+\\&amp;+ \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i 
+\\&amp;+ \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_{10}SouthEast_i 
+\\&amp;+ \beta_{11}SouthWest_i + \beta_{12}RockyMountains_i + \beta_{13}FarWest_i 
+\\&amp;+ \beta_{14}Outlying_i + \epsilon_{ijk}
+\end{aligned}
+\]</span></p>
 <p>However, our data violates a vital assumption of OLS models: that all entries in the data are independent. There are three levels in our model in which the entries have the potential to be correlated to one another: the school or institution level, the level containing each athletic program, and the year level. The key difference between an OLS model and a mixed effects model is the inclusion of random effects, variables that control for the random variability within each level in our model. The first level, the schools, are very important to consider. Any entries from a specific college or university have the potential to be correlated with other entries from the same school. For example, the win percentage of any program at the University of Michigan is going to be correlated with the win percentage at the University of Michigan in other entries, therefore not all entries are independent. The second level in our model is the program level. In this level it is important to take note that the win percentage of a specific program in one year is going to be correlated with other entries from the same program. The University of Alabama historically has a very successful football program, and we can expect that the win percentage of the University of Alabama in 2010 is not completely independent from its win percentage in 2011. The third and final level in this model is the year. For this level we need to consider that for any one program at any specific school, there will be random difference from year to year.</p>
 <p>When using a linear mixed effects model, there are both fixed effects and random effects. In our models, the <span class="math inline">\(\beta_s\)</span> represent the fixed effects. These variables will be constant over the program or school it represents. In our mixed effect models the random effects, that vary over each program or school, will be represented by <span class="math inline">\(s_i\)</span>, <span class="math inline">\(p_{ij}\)</span>, <span class="math inline">\(m_iAPR\)</span>, <span class="math inline">\(m_{ij}APR\)</span> and <span class="math inline">\(\epsilon_i,_j,_k\)</span>.</p>
 <p>Instead of using least squares to estimate our regression coefficients, the linear mixed effects model uses restricted maximum likelihood, or REML. This separates the part of the data used to calculate the variance estimates from that used to calculate the fixed effects, producing an unbiased variance estimate.</p>
@@ -1022,7 +941,16 @@ NA
 </tbody>
 </table>
 <p>Model 6.a: <span class="math inline">\(Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}\)</span></p>
-<p>Model 6.b: <span class="math inline">\(Y_i,_j,_k = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_{i} + \beta_3PercentWhite_i + \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}\)</span></p>
+<p>Model 6.b:</p>
+<p><span class="math display">\[
+\begin{aligned}
+Y_{ijk} = &amp;\alpha_0 + \beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i 
+\\&amp;+ \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i 
+\\&amp;+ \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_{10}SouthEast_i 
+\\&amp;+ \beta_{11}SouthWest_i + \beta_{12}RockyMountains_i + \beta_{13}FarWest_i 
+\\&amp;+ \beta_{14}Outlying_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}
+\end{aligned}
+\]</span></p>
 <p>We can also further analyze model 6 to see if it can be improved by adding more fixed effects, other than APR Score, from the College Scorecard Database. Similar to models 2 and 3, the second equation uses APR in addition to the most correlated variables from the College Scorecard Database and Model 3 depicts a model that also includes the variables that are very slightly correlated in addition to dummy variables for the different geographic regions.</p>
 <p><span class="math display">\[\begin{equation*}
 \textrm{Pseudo }R^2_{L3_s} = \frac{\hat{\sigma_s}^{2}(\textrm{Model 6})-\hat{\sigma_s}^{2}(\textrm{Model 6.a})}{\hat{\sigma_s}^{2}(\textrm{Model 6})} = \frac{41.21-24.95}{41.21} = 0.3946
@@ -1099,7 +1027,16 @@ Model 6
 <div id="results" class="section level2">
 <h2>Results</h2>
 <p>As stated in the methodology section, Model 6.b (shown below) is the model that will be analyzed to draw our results. This three-level mixed effects model includes fixed effects for APR Score and all the variables that are slightly correlated, dummy variables for the different geographic regions, and random effects for school-to-school variability, program-to-program variability, changes in rates of change from program to program, and an error term for unexplained year-to-year variability.</p>
-<p>Model 6.b: <span class="math inline">\(Y_i,_j,_k = \alpha_0 + \beta_1APR_{ijk} + \beta_2Enrollment_{i} + \beta_3PercentWhite_i + \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}\)</span></p>
+<p>Model 6.b:</p>
+<p><span class="math display">\[
+\begin{aligned}
+Y_{ijk} = &amp;\alpha_0 + \beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i 
+\\&amp;+ \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i 
+\\&amp;+ \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_{10}SouthEast_i 
+\\&amp;+ \beta_{11}SouthWest_i + \beta_{12}RockyMountains_i + \beta_{13}FarWest_i 
+\\&amp;+ \beta_{14}Outlying_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}
+\end{aligned}
+\]</span></p>
 <p>From the model results shown in Table 5, a total 17,661 observations from 374 different schools and 2,168 different programs were used to estimate our model. We can interpret our results as follows:</p>
 <p>Fixed Effects:</p>
 <ul>

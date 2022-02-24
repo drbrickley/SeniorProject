@@ -6,11 +6,7 @@ output: html_document
 ---
 
 
-<style type="text/css">
-  body{
-  font-size: 16pt;
-}
-</style>
+
 
 
 ```{r setup, include=FALSE}
@@ -34,6 +30,7 @@ library(pander)
 library(skimr)
 library(corrplot)
 library(sjPlot)
+library(stargazer)
 ```
 
 ```{r}
@@ -200,14 +197,12 @@ coef(summary(fullprogramslope))
 
 ## Data
 
-  The data in this research merged two datasets from the NCAA and data from the College Scorecard.  The resulting dataframe is panel data that contains data from 394 schools and nine different sports over eight years.  This study focuses only on Division 1 team sports and the relationship between team academic performance and that team's athletic success.  Specifically this data was filtered to focus on nine team sports: Men's Soccer, Women's Soccer, Baseball, Softball, Men's Basketball, Women's Basketball, Football, Men's Ice Hockey, and Women's Ice Hockey.  In total there are 17,700 observations with 17 variables.  Table 1 (below) shows the first five rows of the data and the 14 main variables that are important to this research, excluding shifted variables for year and APR score and the specific state of the school.
+  The data in this research merged two datasets from the NCAA and data from the College Scorecard.  The resulting dataframe is panel data that contains data from 394 schools and nine different sports over eight years.  This study focuses only on Division 1 team sports and the relationship between team academic performance and that team's athletic success.  Specifically this data was filtered to focus on nine team sports: Men's Soccer, Women's Soccer, Baseball, Softball, Men's Basketball, Women's Basketball, Football, Men's Ice Hockey, and Women's Ice Hockey.  In total there are 17,700 observations with 17 variables.  Table 1 (below) shows the first five rows of the data and the 12 main variables that are important to this research, excluding ID numbers, shifted variables for year and APR score and the specific state of the school.
   
-```{r table1,fig.align="center",out.width="60%",echo=FALSE, warning = FALSE}
-table1 <- sports %>% select(School, "School ID" = School_ID, Region, "Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Program ID" = program.id, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
+```{r table1,echo=FALSE, warning = FALSE, results= 'asis'}
+table1 <- sports %>% select(School, Region, "Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
 preview <- head(table1, 5)
-kable(preview, booktabs=T,
-      caption="Table 1: A snapshot of selected variables from the first five observations in the academics and athletics combined dataset.") %>%
-    kable_styling(latex_options = "scale_down", font_size = 16) 
+stargazer(preview, type = 'html', summary = FALSE, title= "Table 1: Selected variables from the first five observations in the dataset.")
 ```
   
   The first dataset used is the NCAA Academic Progress Rate Database. From this the variables of interest are the schools, the state each school is in, the various sports, the individual years, and each specific program's APR score.  Each athlete on the team can receive at most 2 points, one for remaining eligible over the semester and another for staying at the institution. So, each athlete can have anywhere between zero and two points for a given semester. The APR score for each Division I team is calculated by adding all points earned by the team and dividing that total by the maximum possible number of points that could have been earned. This percentage is then multiplied by 1,000 to return the team’s APR score. Thus, an APR of 950 means that the student-athletes in the cohort earned 95 percent of the eligibility and retention points that they could have earned.  It is important to note that APR in this dataset represents a four-year rolling average of APR scores.  Figure 1 (below) shows the variation in APR scores between sports and years.  Men's Basketball, Baseball, and Football all have lower APR scores on average from the other sports (a), where Men's and Women's Ice Hockey has higher APR scores on average. We can also see that over the 8-year time period in our data (b) APR scores on average have increased.
@@ -234,13 +229,11 @@ grid.arrange(box.sport, box.sport2, ncol = 1)
   
   The final data accessed is the College Scorecard data.  This database provides information about each specific institution not specific to athletics.  Each observation has the school's ID number and the name of the school.  For each school in each year the variables that were considered for their relevance are the geographic region of the school, the percentage of degrees awarded in Communication, Journalism, And Related Programs, the total enrollment, the percent of the student body that is white, the percent of the student body that is male, the average cost of attendance in each year, and the age at which students enroll at the institution.  As with any form of modeling it is important to hold constant variables that may bias results and affect their validity.  The College Scorecard data is used to include school-level variables and to determine what aspects of a school would have an effect on its sports' win percentages.  
   
-```{r table2, echo=FALSE, out.width = "60%", warning=FALSE}
-summarydata <- sports %>% select(School, "School ID" = School_ID, Region, "Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Program ID" = program.id, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
+```{r table2, echo=FALSE, out.width = "60%", warning=FALSE, results = 'asis'}
+summarydata <- sports %>% select("Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Region, Sport, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
 
-summary <- summary(summarydata)
-kable(summary, booktabs=T,
-      caption="Table 2: Summary Statistics of the combined datasets.") %>%
-    kable_styling(latex_options = "scale_down", font_size = 16)
+stargazer(summarydata, type = "html",summary.stat = c("mean","sd", "min", "p25", "median", "p75", "max"), title = "Table 2: Summary Statistics")
+
 ```
   
   The first variable that was considered for its relevance was geographic region.  In Minyong Song and Yang Zhang's Study, *Research on the Relationship between Geographical Factors, Sports and Culture*, they conclude that "The geographical environment influences the emergence and development of sports events in different ways, Climate changes will affect the conditions of sports, but also interfere with the athletes’ body mechanism and emotion, thereby affecting athletic ability."  Their findings give merit to consider geographic region as a possible influence on win percentage.  The breakdown that follows is the classification of the geographic regions:
@@ -294,7 +287,17 @@ LMRegion
   
   Model 2: $Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i + \epsilon_{ijk}$
   
-  Model 3: $Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i + \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + \epsilon_{ijk}$
+  Model 3: 
+
+$$
+\begin{aligned}
+Y_{ijk} = &\alpha_0 + \beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i 
+\\&+ \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i 
+\\&+ \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_{10}SouthEast_i 
+\\&+ \beta_{11}SouthWest_i + \beta_{12}RockyMountains_i + \beta_{13}FarWest_i 
+\\&+ \beta_{14}Outlying_i + \epsilon_{ijk}
+\end{aligned}
+$$
 
   However, our data violates a vital assumption of OLS models: that all entries in the data are independent.  There are three levels in our model in which the entries have the potential to be correlated to one another: the school or institution level, the level containing each athletic program, and the year level.  The key difference between an OLS model and a mixed effects model is the inclusion of random effects, variables that control for the random variability within each level in our model.  The first level, the schools, are very important to consider.  Any entries from a specific college or university have the potential to be correlated with other entries from the same school.  For example, the win percentage of any program at the University of Michigan is going to be correlated with the win percentage at the University of Michigan in other entries, therefore not all entries are independent.  The second level in our model is the program level.  In this level it is important to take note that the win percentage of a specific program in one year is going to be correlated with other entries from the same program.  The University of Alabama historically has a very successful football program, and we can expect that the win percentage of the University of Alabama in 2010 is not completely independent from its win percentage in 2011.  The third and final level in this model is the year.  For this level we  need to consider that for any one program at any specific school, there will be random difference from year to year.
   
@@ -369,7 +372,17 @@ kable(did_print, booktabs=T,
 
 Model 6.a: $Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}$
 
-Model 6.b: $Y_i,_j,_k = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_{i} + \beta_3PercentWhite_i + \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}$
+Model 6.b: 
+
+$$
+\begin{aligned}
+Y_{ijk} = &\alpha_0 + \beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i 
+\\&+ \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i 
+\\&+ \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_{10}SouthEast_i 
+\\&+ \beta_{11}SouthWest_i + \beta_{12}RockyMountains_i + \beta_{13}FarWest_i 
+\\&+ \beta_{14}Outlying_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}
+\end{aligned}
+$$
 
 We can also further analyze model 6 to see if it can be improved by adding more fixed effects, other than APR Score, from the College Scorecard Database. Similar to models 2 and 3, the second equation uses APR in addition to the most correlated variables from the College Scorecard Database and Model 3 depicts a model that also includes the variables that are very slightly correlated in addition to dummy variables for the different geographic regions. 
 
@@ -402,7 +415,17 @@ kable(covariatecomp, booktabs=T,
 
 As stated in the methodology section, Model 6.b (shown below) is the model that will be analyzed to draw our results.  This three-level mixed effects model includes fixed effects for APR Score and all the variables that are slightly correlated, dummy variables for the different geographic regions, and random effects for school-to-school variability, program-to-program variability, changes in rates of change from program to program, and an error term for unexplained year-to-year variability.
 
-Model 6.b: $Y_i,_j,_k = \alpha_0 + \beta_1APR_{ijk} + \beta_2Enrollment_{i} + \beta_3PercentWhite_i + \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i + \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_10SouthEast_i + \beta_11SouthWest_i + \beta_12RockyMountains_i + \beta_13FarWest_i + \beta_14Outlying_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}$
+Model 6.b: 
+
+$$
+\begin{aligned}
+Y_{ijk} = &\alpha_0 + \beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i 
+\\&+ \beta_4PercentMale_i + \beta_5PercentCommunication_i + \beta_6NewEngland_i 
+\\&+ \beta_7MidEast_i + \beta_8GreatLakes_i + \beta_9Plains_i + \beta_{10}SouthEast_i 
+\\&+ \beta_{11}SouthWest_i + \beta_{12}RockyMountains_i + \beta_{13}FarWest_i 
+\\&+ \beta_{14}Outlying_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}
+\end{aligned}
+$$
 
 From the model results shown in Table 5, a total 17,661 observations from 374 different schools and 2,168 different programs were used to estimate our model.  We can interpret our results as follows:
 
