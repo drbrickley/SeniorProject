@@ -181,8 +181,9 @@ Full <- Full %>% select(-instnm, -Penalties, -Postseason) %>%
   mutate(pcip09 = pcip09 * 100,
          ugds_men = ugds_men * 100,
          ugds_white = ugds_white * 100,
-         Region = as.factor(region)) %>%
-  select(-region, -W, -L, -T, -Rank)
+         Region = as.factor(region),
+         Program = program.id) %>%
+  select(-region, -W, -L, -T, -Rank, -program.id)
 
 summary(Full)
 

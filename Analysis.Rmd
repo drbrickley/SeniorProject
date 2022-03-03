@@ -1,7 +1,7 @@
 ---
 title: "The Effect of Academic Performance on Athletic Success in Collegiate Athletic Programs"
 author: "Derek Brickley"
-date: "2/25/2022"
+date: "3/14/2022"
 output: html_document
 ---
 
@@ -47,7 +47,7 @@ sports %>% count(Start.Year)
 ```{r, results = 'hide'}
 select <- dplyr::select
 keydata <- sports %>% 
-  dplyr::select(program.id,
+  dplyr::select(Program,
       Pct, Start.Year, Sport, School, State, Multi.Year.APR)
 # Create Level2 data set by picking off one observation 
 # per subject, which would be easier if every subject 
@@ -130,7 +130,7 @@ OLSfull = lm(Pct ~ centeredAPR + ugds + ugds_white + ugds_men + pcip09 + factor(
 ```
 
 ```{r, results = 'hide'}
-partialintercept = lmer(Pct ~ centeredAPR + (1|School) + (1|program.id), REML=T, data=sports)
+partialintercept = lmer(Pct ~ centeredAPR + (1|School) + (1|Program), REML=T, data=sports)
 
 VCrandom <- VarCorr(partialintercept)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -142,7 +142,7 @@ coef(summary(partialintercept))
 ```
 
 ```{r, results = 'hide'}
-partialschoolslope = lmer(Pct ~ centeredAPR + (centeredAPR|School) + (1|program.id), REML=T, data=sports)
+partialschoolslope = lmer(Pct ~ centeredAPR + (centeredAPR|School) + (1|Program), REML=T, data=sports)
 
 VCrandom <- VarCorr(partialschoolslope)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -154,7 +154,7 @@ coef(summary(partialschoolslope))
 ```
 
 ```{r, results = 'hide'}
-baseprogramslope = lmer(Pct ~ centeredAPR + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
+baseprogramslope = lmer(Pct ~ centeredAPR + (1|School) + (centeredAPR|Program), REML=T, data=sports)
 
 VCrandom <- VarCorr(baseprogramslope)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -166,7 +166,7 @@ coef(summary(baseprogramslope))
 ```
 
 ```{r, results = 'hide'}
-partialprogramslope = lmer(Pct ~ centeredAPR + ugds + ugds_white + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
+partialprogramslope = lmer(Pct ~ centeredAPR + ugds + ugds_white + (1|School) + (centeredAPR|Program), REML=T, data=sports)
 
 VCrandom <- VarCorr(partialprogramslope)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -178,7 +178,7 @@ coef(summary(partialprogramslope))
 ```
 
 ```{r, results = 'hide'}
-fullprogramslope = lmer(Pct ~ centeredAPR + ugds + ugds_white + ugds_men + pcip09 + factor(Region) + (1|School) + (centeredAPR|program.id), REML=T, data=sports)
+fullprogramslope = lmer(Pct ~ centeredAPR + ugds + ugds_white + ugds_men + pcip09 + factor(Region) + (1|School) + (centeredAPR|Program), REML=T, data=sports)
 
 VCrandom <- VarCorr(fullprogramslope)
 print(VCrandom, comp = c("Variance", "Std.Dev."))
@@ -231,9 +231,9 @@ grid.arrange(box.sport, box.sport2, ncol = 1)
   The final data accessed is the College Scorecard data.  This database provides information about each specific institution not specific to athletics.  Each observation has the school's ID number and the name of the school.  For each school in each year the variables that were considered for their relevance are the geographic region of the school, the percentage of degrees awarded in Communication, Journalism, And Related Programs, the total enrollment, the percent of the student body that is white, the percent of the student body that is male, the average cost of attendance in each year, and the age at which students enroll at the institution.  As with any form of modeling it is important to hold constant variables that may bias results and affect their validity.  The College Scorecard data is used to include school-level variables and to determine what aspects of a school would have an effect on its sports' win percentages.  
   
 ```{r table2, echo=FALSE, out.width = "60%", warning=FALSE, results = 'asis'}
-summarydata <- sports %>% select("Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Region, Sport, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
+summarydata <- sports %>% select("Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR)
 
-stargazer(summarydata, type = "html",summary.stat = c("mean","sd", "min", "p25", "median", "p75", "max"), title = "Table 2: Summary Statistics")
+stargazer(summarydata, type = "html",summary.stat = c("mean", "min", "p25", "median", "p75", "max", "n"), title = "Table 2: Summary Statistics", digits = 1)
 
 ```
   
@@ -261,14 +261,14 @@ One other variable that needs to be considered is the percentage of the student 
 
 ## Methodology
 
-  Our main purpose is to interpret how program's APR scores, measuring academic success, impact program's win percentages.  Using Ordinary Least Squares regression and multiple mixed-effects models, we can evaluate this relationship.  However, it is important to include variables in our models that impact a program's win percentage outside of APR scores.  By looking at each variable from the College Scorecard Database and its correlation with APR scores and win percentage we can see if it is valuable to the models.  Figure 2 (below) explores this correlation between each variable, where a larger, darker red number indicates a stronger, negative correlation and a larger, darker blue number indicates a stronger positive correlation.  On the diagonal we see the dark blue number $1.00$, representing that each variable is perfectly correlated with itself.  Looking at the row and column for win percentage in Figure 2, we can see that APR Scores, the percent white, and the total student enrollment are the most correlated with win percentage, the percent communication and percent male have very small correlation, and the average cost and average age have essentially no correlation.  With no correlation, the average cost and average age of enrollment will not be included in the models as they add no value to our results.  We will include models that include these variables, and models that do not to determine the effect these controls may have based on the differences in our results.
+  Our main purpose is to interpret how program's APR scores, measuring academic success, impact program's win percentages.  Using Ordinary Least Squares regression and multiple mixed-effects models, we can evaluate this relationship.  However, it is important to include variables in our models that impact a program's win percentage outside of APR scores.  By looking at each variable from the College Scorecard Database and its correlation with APR scores and win percentage we can see if it is valuable to the models.  Figure 2 (below) explores this correlation between each variable, where a larger, darker red number indicates a stronger, negative correlation and a larger, darker blue number indicates a stronger positive correlation.  Looking at the row and column for win percentage in Figure 2, we can see that APR Scores, the percent white, and the total student enrollment are the most correlated with win percentage, the percent communication and percent male have very small correlation, and the average cost and average age have essentially no correlation.  With no correlation, the average cost and average age of enrollment will not be included in the models as they add no value to our results.  We will include models that include these variables, and models that do not to determine the effect these controls may have based on the differences in our results.
   
 ```{r, fig.cap="Figure 2: The correlation between variables"}
 select_sports <- sports %>% select(Pct, centeredAPR, pcip09, ugds, ugds_men, ugds_white, costt4_a, age_entry) %>%
   rename('Win Percentage' = Pct, "APR" = centeredAPR, "Percent Communication; Etc." = pcip09, "Students Enrolled" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost" = costt4_a, "Average age at entry" = age_entry)
 Corr <- cor(select_if(select_sports, is.numeric), use="complete.obs")
-corrplot(Corr, method="number", type = "lower", order = "hclust", 
-         tl.col = "black", tl.srt = 45)
+corrplot(Corr, method= "color", type = "lower", order = "hclust", 
+         tl.col = "black", tl.srt = 45, bg = "white", addCoef.col = "black", number.digits = 1, diag = FALSE)
 ```
 
   It is also important to explore the possibility of differences in location.  Perhaps programs in the Southwest have higher win percentages on average than programs in New England.  Figure 3 (below) demonstrates differences in win percentage for the different geographic regions.  Generally speaking, all regions have a median win percentage of roughly 50%. Without major differences between regions, they may not contribute to our final results, but we will look at our models with and without a variable controlling for the geographic region and compare the estimates.
@@ -330,7 +330,7 @@ sportsrd <- sports %>%
   filter(School %in% randsport)
   
 diffslopeprogram <-ggplot(sportsrd, aes(x=Start.Year, y=Multi.Year.APR)) + 
-  facet_wrap(~program.id,ncol=5) + 
+  facet_wrap(~Program,ncol=5) + 
   geom_point() + 
   geom_smooth(method="lm") + 
   theme.1 +
@@ -348,7 +348,7 @@ grid.arrange(diffslopeschool, diffslopeprogram, ncol = 1)
   
   Model 6: $Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}$
   
-When we add these random effects to the fixed effects in Model 1, we have 3 different base models.  Model 4 includes only intercept random effects, while Model 5 and 6 include slope random effects for schools and programs respectively.  We can use likelihood ratio tests to compare our models.  In doing so, the models are refitted using full maximum likelihood, since we are focusing on model parameters and not random effects.  We can see the comparison in Table 3 (below).  In this case, the AIC  favors Model 6 (145425) over Model 5 (145538) and Model 4 (145615).  The BIC favors Model 6 as well (145480)  over Model 5 (145593) and Model 4 (145654).  The likelihood is largest and the log-likelihood is least negative under the model with the program slope random effect (Model 6).  We can conclude that Model 6 outperforms both Model 4 and Model 5.
+When we add these random effects to the fixed effects in Model 1, we have 3 different base models.  Model 4 includes only intercept random effects, while Model 5 and 6 include slope random effects for schools and programs respectively.  A school or program with a lower APR score and Win Percentage in 2010 may see a sharper increase than schools or programs with a higher APR score and Win Percentage initially.  We can use likelihood ratio tests to compare our models.  In doing so, the models are refitted using full maximum likelihood, since we are focusing on model parameters and not random effects.  We can see the comparison in Table 3 (below).  In this case, the AIC  favors Model 6 (145425) over Model 5 (145538) and Model 4 (145615).  The BIC favors Model 6 as well (145480)  over Model 5 (145593) and Model 4 (145654).  We can conclude that Model 6 outperforms both Model 4 and Model 5.
 
 ```{r}
 `Model 4` <- partialintercept
@@ -432,7 +432,7 @@ From the model results shown in Table 5, a total 17,661 observations from 374 di
 
 Fixed Effects:
 
-- $\alpha_0 = 38.572 =$ the mean win percentage of an athletic program with a mean APR Score of 974.4, which is a centered APR score of 0.
+- $\alpha_0 = 38.572 =$ the mean win percentage of an athletic program with a mean APR Score of 974.4 at a U.S. service school where enrollment is 0 students, 0 percent of which are white, 0 percent of which are male, and 0 percent are communication majors.  Of course there is no school in our data where this holds, so this estimate is not a valid interpretation of any school in our dataset.
 
 - $\beta_1 = 0.104 =$ the estimated increase in a program's win percentage for a 1 point increase in APR score after controlling for total enrollment, the percent white, the percent male, the percent communications majors, and the geographic region.  
 
@@ -473,7 +473,7 @@ Random Effects:
 - $\rho_{01} = 0.145 =$ the correlation in programs’ random intercept and their random rates of change.
 
 ```{r}
-results <- tab_model(`Model 6.b`, show.se = TRUE, show.ci = FALSE, show.p = FALSE, show.stat = TRUE, show.icc = FALSE, show.r2 = FALSE, show.intercept = TRUE, pred.labels = c("Intercept", "Centered APR Score", "Total Enrollment", "Percent White", "Percent Male", "Percent Communication Majors", "New England", "Mid East", "Great Lakes", "Plains", "Southeast", "Southwest", "Rocky Mountains", "Far West"), dv.labels = ("Win Percentage"), string.stat = "T Statistic", string.se = "Std. Error", digits = 3, digits.re = 5, title = "Table 5: Mixed Effects Model 6.b Results")
+results <- tab_model(`Model 6.b`, show.se = TRUE, show.ci = FALSE, show.p = FALSE, show.stat = TRUE, show.icc = FALSE, show.r2 = FALSE, show.intercept = TRUE, pred.labels = c("Intercept", "Centered APR Score", "Total Enrollment", "Percent White", "Percent Male", "Percent Communication Majors", "New England", "Mid East", "Great Lakes", "Plains", "Southeast", "Southwest", "Rocky Mountains", "Far West"), dv.labels = ("Win Percentage"), string.stat = "T Stat", string.se = "SE", digits = 3, digits.re = 5, title = "Table 5: Mixed Effects Model 6.b Results")
 results
 ```
 
