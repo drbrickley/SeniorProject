@@ -233,7 +233,7 @@ grid.arrange(box.sport, box.sport2, ncol = 1)
 ```{r table2, echo=FALSE, out.width = "60%", warning=FALSE, results = 'asis'}
 summarydata <- sports %>% select("Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR)
 
-stargazer(summarydata, type = "html",summary.stat = c("mean", "min", "p25", "median", "p75", "max", "n"), title = "Table 2: Summary Statistics", digits = 1)
+stargazer(summarydata, type = "html", title = "Table 2: Summary Statistics", summary.stat = c("mean","sd", "min", "p25", "median", "p75", "max"), digits = 1, digits.extra = 0)
 
 ```
   
