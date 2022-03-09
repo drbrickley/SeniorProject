@@ -267,7 +267,7 @@ One other variable that needs to be considered is the percentage of the student 
 select_sports <- sports %>% select(Pct, centeredAPR, pcip09, ugds, ugds_men, ugds_white, costt4_a, age_entry) %>%
   rename('Win Percentage' = Pct, "APR" = centeredAPR, "Percent Communication; Etc." = pcip09, "Students Enrolled" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost" = costt4_a, "Average age at entry" = age_entry)
 Corr <- cor(select_if(select_sports, is.numeric), use="complete.obs")
-corrplot(Corr, method= "color", type = "lower", order = "hclust", 
+corrplot(Corr, method= "color", type = "lower", order = "original", 
          tl.col = "black", tl.srt = 45, bg = "white", addCoef.col = "black", number.digits = 1, diag = FALSE)
 ```
 
@@ -348,7 +348,7 @@ grid.arrange(diffslopeschool, diffslopeprogram, ncol = 1)
   
   Model 6: $Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}$
   
-When we add these random effects to the fixed effects in Model 1, we have 3 different base models.  Model 4 includes only intercept random effects, while Model 5 and 6 include slope random effects for schools and programs respectively.  A school or program with a lower APR score and Win Percentage in 2010 may see a sharper increase than schools or programs with a higher APR score and Win Percentage initially.  We can use likelihood ratio tests to compare our models.  In doing so, the models are refitted using full maximum likelihood, since we are focusing on model parameters and not random effects.  We can see the comparison in Table 3 (below).  In this case, the AIC  favors Model 6 (145425) over Model 5 (145538) and Model 4 (145615).  The BIC favors Model 6 as well (145480)  over Model 5 (145593) and Model 4 (145654).  We can conclude that Model 6 outperforms both Model 4 and Model 5.
+When we add these random effects to the fixed effects in Model 1, we have 3 different base models.  Model 4 includes only intercept random effects, while Model 5 and 6 include slope random effects for schools and programs respectively.  In other words, this allows for the rate of change in Win Percentage to differ based on the school or program's average APR score.  A school or program with a lower APR score may see a sharper increase in Win Percentage than schools or programs with a higher APR score.  We can use likelihood ratio tests to compare our models.  In doing so, the models are refitted using full maximum likelihood, since we are focusing on model parameters and not random effects.  We can see the comparison in Table 3 (below).  In this case, the AIC  favors Model 6 (145425) over Model 5 (145538) and Model 4 (145615).  The BIC favors Model 6 as well (145480)  over Model 5 (145593) and Model 4 (145654).  We can conclude that Model 6 outperforms both Model 4 and Model 5.
 
 ```{r}
 `Model 4` <- partialintercept
@@ -388,14 +388,14 @@ $$
 We can also further analyze model 6 to see if it can be improved by adding more fixed effects, other than APR Score, from the College Scorecard Database. Similar to models 2 and 3, the second equation uses APR in addition to the most correlated variables from the College Scorecard Database and Model 3 depicts a model that also includes the variables that are very slightly correlated in addition to dummy variables for the different geographic regions. 
 
 \begin{equation*}
-\textrm{Pseudo }R^2_{L3_s} = \frac{\hat{\sigma}^{2}(\textrm{Model 6})-\hat{\sigma}^{2}(\textrm{Model 6.a})}{\hat{\sigma}^{2}(\textrm{Model 6})} = \frac{41.21-24.95}{41.21} = 0.3946
+\textrm{Pseudo }R^2_{L3_s} = \frac{\hat{\sigma_s}^{2}(\textrm{Model 6})-\hat{\sigma_s}^{2}(\textrm{Model 6.a})}{\hat{\sigma_s}^{2}(\textrm{Model 6})} = \frac{41.21-24.95}{41.21} = 0.3946
 \end{equation*}
 
 \begin{equation*}
-\textrm{Pseudo }R^2_{L3_s} = \frac{\hat{\sigma}^{2}(\textrm{Model 6.a})-\hat{\sigma}^{2}(\textrm{Model 6.b})}{\hat{\sigma}^{2}(\textrm{Model 6.a})} = \frac{24.95-21.10}{24.95} = 0.1543
+\textrm{Pseudo }R^2_{L3_s} = \frac{\hat{\sigma_s}^{2}(\textrm{Model 6.a})-\hat{\sigma_s}^{2}(\textrm{Model 6.b})}{\hat{\sigma_s}^{2}(\textrm{Model 6.a})} = \frac{24.95-21.10}{24.95} = 0.1543
 \end{equation*}
 
-No variables are added at the yearly, or program level, so when adding College Scorecard variables to Model 6, there will be no change in program slope or intercept terms.  To analyze the addition of these variables to the model we can look at the $\textrm{Pseudo }R^2_{L3_s}$ which describes the improvement from model to model in explaining school-to-school variability in intercepts.  The addition of these variables at the school level has decreased the between-school variability in win percentage by 39.46% from model 6 to 6.a and an additional 15.43% from model 6.a to 6.b.  Using AIC and BIC tests in Table 4 (below), we see that AIC favors model 6.b, but BIC favors model 6.a due to the fact that BIC has a larger penalty for each additional variable and more model complexity.  Due to the improvement in models using $\textrm{Pseudo }R^2_{L3_s}$ and the slight favoritism of Model 6.b with AIC, Model 6.b is the final model that will be used throughout the remainder of our research.
+In an ordinary $\textrm{Pseudo }R^2$ calculation, we would be looking at $\sigma^2$ to determine the impact of the different models on year to year variability within programs, however no variables are added at the yearly, or program level, so when adding College Scorecard variables to Model 6, there will be no change in program slope or intercept terms.  To analyze the addition of these variables to the model we can look at the $\textrm{Pseudo }R^2_{L3_s}$ using $\sigma_s^2$ to describe the improvement from model to model in explaining school-to-school variability in intercepts.  The addition of these variables at the school level has decreased the between-school variability in win percentage by 39.46% from model 6 to 6.a and an additional 15.43% from model 6.a to 6.b.  Using AIC and BIC tests in Table 4 (below), we see that AIC favors model 6.b, but BIC favors model 6.a due to the fact that BIC has a larger penalty for each additional variable and more model complexity.  Due to the improvement in models using $\textrm{Pseudo }R^2_{L3_s}$ and the slight favoritism of Model 6.b with AIC, Model 6.b is the final model that will be used throughout the remainder of our research.
 
 ```{r}
 `Model 6.a` <- partialprogramslope
@@ -434,31 +434,31 @@ Fixed Effects:
 
 - $\alpha_0 = 38.572 =$ the mean win percentage of an athletic program with a mean APR Score of 974.4 at a U.S. service school where enrollment is 0 students, 0 percent of which are white, 0 percent of which are male, and 0 percent are communication majors.  Of course there is no school in our data where this holds, so this estimate is not a valid interpretation of any school in our dataset.
 
-- $\beta_1 = 0.104 =$ the estimated increase in a program's win percentage for a 1 point increase in APR score after controlling for total enrollment, the percent white, the percent male, the percent communications majors, and the geographic region.  
+- $\beta_1 = 0.104 =$ the estimated increase in a program's win percentage for a 1 point increase in APR score after controlling for total enrollment, the percent white, the percent male, the percent communications majors, and the geographic region.  With a T-Statistic of 10.544, this is statistically significant.  
 
-- $\beta_2 = 0.000267 =$ the estimated increase in win percentage for one more enrolled student at the school after controlling for APR score, the percent white, the percent male, the percent communications majors, and the geographic region.  A single student increase is not reasonable, so we can say that a 1,000 student increase in enrollment corresponds to 0.267 percentage point increase in win percentage.
+- $\beta_2 = 0.000267 =$ the estimated increase in win percentage for one more enrolled student at the school after controlling for APR score, the percent white, the percent male, the percent communications majors, and the geographic region.  A single student increase is not reasonable, so we can say that a 1,000 student increase in enrollment corresponds to 0.267 percentage point increase in win percentage.  With a T-Statistic of 7.905, this is also statistically significant.
 
-- $\beta_3 = 0.118 =$ the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is white after controlling for APR score, total enrollment, the percent male, the percent communications majors, and the geographic region.  
+- $\beta_3 = 0.118 =$ the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is white after controlling for APR score, total enrollment, the percent male, the percent communications majors, and the geographic region.  The T-Statistic of 7.494 shows that this is significant.
 
-- $\beta_4 = 0.011 =$ the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is male after controlling for APR score, total enrollment, the percent white, the percent communications majors, and the geographic region. 
+- $\beta_4 = 0.011 =$ the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is male after controlling for APR score, total enrollment, the percent white, the percent communications majors, and the geographic region. The small T-Statistic of 0.263 shows this is insignificant.
 
-- $\beta_5 = 0.226 =$ the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is majoring in communications or a related field after controlling for APR score, total enrollment, the percent white, the percent male, and the geographic region. 
+- $\beta_5 = 0.226 =$ the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is majoring in communications or a related field after controlling for APR score, total enrollment, the percent white, the percent male, and the geographic region. The T-Statistic of 3.213 is significant, but not as much as APR Score, Enrollment, or Percent White.  
 
-- ${\beta}_{6} = -3.744 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, and Vermont.
+- ${\beta}_{6} = -3.744 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, and Vermont. The low T-Statistic demonstrates that this is statistically insignificant.
 
-- ${\beta}_{7} = -3.618 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Delaware, District of Columbia, Maryland, New Jersey, New York, and Pennsylvania.
+- ${\beta}_{7} = -3.618 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Delaware, District of Columbia, Maryland, New Jersey, New York, and Pennsylvania. The low T-Statistic demonstrates that this is statistically insignificant.
 
-- ${\beta}_{8} = -3.528 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Illinois, Indiana, Michigan, Ohio, and Wisconsin.
+- ${\beta}_{8} = -3.528 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Illinois, Indiana, Michigan, Ohio, and Wisconsin. The low T-Statistic demonstrates that this is statistically insignificant.
 
-- ${\beta}_{9} = -0.444 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Iowa, Kansas, Minnesota, Missouri, Nevada, North Dakota, and South Dakota.
+- ${\beta}_{9} = -0.444 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Iowa, Kansas, Minnesota, Missouri, Nevada, North Dakota, and South Dakota. The low T-Statistic demonstrates that this is statistically insignificant.
 
-- ${\beta}_{10} = 0.560 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Alabama, Arkansas, Florida, Georgia, Kentucky, Louisiana, Mississippi, North Carolina, South Carolina, Tennessee, Virginia, and West Virginia.
+- ${\beta}_{10} = 0.560 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Alabama, Arkansas, Florida, Georgia, Kentucky, Louisiana, Mississippi, North Carolina, South Carolina, Tennessee, Virginia, and West Virginia. The low T-Statistic demonstrates that this is statistically insignificant.
 
-- ${\beta}_{11} = 1.978 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Arizona, New Mexico, Oklahoma, and Texas.
+- ${\beta}_{11} = 1.978 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Arizona, New Mexico, Oklahoma, and Texas. The low T-Statistic demonstrates that this is statistically insignificant.
 
-- ${\beta}_{12} = -1.894 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Colorado, Idaho, Montana, Utah, and Wyoming.
+- ${\beta}_{12} = -1.894 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Colorado, Idaho, Montana, Utah, and Wyoming. The low T-Statistic demonstrates that this is statistically insignificant.
 
-- ${\beta}_{13} = -1.626 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Alaska, California, Hawaii, Nevada, Oregon, and Washington.
+- ${\beta}_{13} = -1.626 =$ the estimated decrease in win percentage compared to U.S. service schools for schools that are in the states of Alaska, California, Hawaii, Nevada, Oregon, and Washington. The low T-Statistic demonstrates that this is statistically insignificant.
 
 Random Effects:
 
@@ -470,14 +470,14 @@ Random Effects:
 
 - $\sigma_m = \sqrt0.052 = 0.228 =$ the standard deviation in rates of change in win percentage relative to APR scores.
 
-- $\rho_{01} = 0.145 =$ the correlation in programs’ random intercept and their random rates of change.
+- $\rho_{01} = 0.145 =$ the correlation in programs’ random intercept and their random rates of change.  This means that programs with an above average APR score see sharper increases in Win Percentage on average, however this is a small correlation.  
 
 ```{r}
 results <- tab_model(`Model 6.b`, show.se = TRUE, show.ci = FALSE, show.p = FALSE, show.stat = TRUE, show.icc = FALSE, show.r2 = FALSE, show.intercept = TRUE, pred.labels = c("Intercept", "Centered APR Score", "Total Enrollment", "Percent White", "Percent Male", "Percent Communication Majors", "New England", "Mid East", "Great Lakes", "Plains", "Southeast", "Southwest", "Rocky Mountains", "Far West"), dv.labels = ("Win Percentage"), string.stat = "T Stat", string.se = "SE", digits = 3, digits.re = 5, title = "Table 5: Mixed Effects Model 6.b Results")
 results
 ```
 
-Based on T-values produced by Model 6.b, APR scores have the most significant effect on a program's win percentage.  As stated above, on average a 1 point increase in APR score corresponds to a 0.104 percentage point increase in win percentage after controlling for all other factors.  However, a 1 point increase is not a reasonable scale when the range of APR scores in our dataset are from 451 to 1,000.  Instead we can interpret this by saying a 10 point increase in APR score is associated with a 1.04 percentage point increase in a program's win percentage, and a 100 point increase corresponds to a 10.4 percentage point increase in win percentage.  A 100 point difference in APR score is therefore equivalent to roughly winning 1 more game out of every 10 games.  
+Based on T-values produced by Model 6.b, APR scores have the most significant effect on a program's win percentage.  As stated above, on average a 1 point increase in APR score corresponds to a 0.104 percentage point increase in win percentage after controlling for all other factors.  However, a 1 point increase is not a reasonable scale when the range of APR scores in our dataset are from 451 to 1,000.  Instead we can interpret this by saying a 10 point increase in APR score is associated with a 1.04 percentage point increase in a program's win percentage, and a 100 point increase corresponds to a 10.4 percentage point increase in win percentage.  A 100 point difference in APR score is therefore equivalent to roughly winning 1 more game out of every 10 games.  From our results and the corresponding T-Statistics, the estimates for APR Score, Total Enrollment, Percent White, and Percent Communication Majors are statistically significant.  Percent male along with the differences between geographic regions are statistically insignificant; they do not significantly differ from 0.  
 
 Controlling for school level variables provided more reliable estimates of the effects of APR scores, while also providing interesting insights.  For example, schools with larger enrollment and schools with a larger percent of the student body being white had higher win percentages on average.  In addition, the inclusion of random effects in our model makes our variance and standard deviation estimates more precise.  However, it is still important to note that the largest amount of deviation occurs from year-to-year within programs rather than from school-to-school or program-to-program within school.  
 
@@ -518,3 +518,13 @@ Academic Progress Rate, NCAA, https://web3.ncaa.org/aprsearch/aprsearch.
 “Data Documentation.” Documentation | College Scorecard, https://collegescorecard.ed.gov/data/documentation/. 
 
 NCAA Statistics, NCAA, https://stats.ncaa.org/rankings/change_sport_year_div. 
+
+## Appendix
+
+```{r table3, echo=FALSE, out.width = "60%", warning=FALSE, results = 'asis'}
+`Model 1` <- OLSinitial
+`Model 2` <- OLSpartial
+`Model 3` <- OLSfull
+
+stargazer(`Model 1`, `Model 2`, `Model 3`, title = "OLS Results", align = TRUE, type = 'html',  dep.var.labels= "Win Percentage", covariate.labels = c("Centered APR Score", "Total Enrollment", "Percent White", "Percent Male", "Percent Communication Majors", "New England", "Mid East", "Great Lakes", "Plains", "Southeast", "Southwest", "Rocky Mountains", "Far West"), column.labels = c("Model 1", "Model 2", "Model 3"))
+```
