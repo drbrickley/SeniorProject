@@ -499,5 +499,5 @@ NCAA Statistics, NCAA, https://stats.ncaa.org/rankings/change_sport_year_div.
 `Model 2` <- OLSpartial
 `Model 3` <- OLSfull
 
-stargazer(`Model 1`, `Model 2`, `Model 3`, title = "Table 6: OLS Results", align = TRUE, type = 'html',  dep.var.labels= "Win Percentage", covariate.labels = c("Centered APR Score", "Total Enrollment", "Percent White", "Percent Male", "Percent Communication Majors", "New England", "Mid East", "Great Lakes", "Plains", "Southeast", "Southwest", "Rocky Mountains", "Far West"), column.labels = c("Model 1", "Model 2", "Model 3"))
+stargazer(`Model 1`, `Model 2`, `Model 3`, title = "OLS Results", align = TRUE, type = 'latex',  dep.var.labels= "Win Percentage", covariate.labels = c("Centered APR Score", "Total Enrollment", "Percent White", "Percent Male", "Percent Communication Majors", "New England", "Mid East", "Great Lakes", "Plains", "Southeast", "Southwest", "Rocky Mountains", "Far West"), column.labels = c("Model 1", "Model 2", "Model 3"))
 ```
