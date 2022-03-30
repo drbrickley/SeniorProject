@@ -5,7 +5,9 @@ author:
   - name: "Faculty Advisor: Professor Andrew J. Sage"
   - name: "Lawrence University"
 date: "3/16/2022"
-output: html_document
+output: 
+  pdf_document:
+      latex_engine: xelatex
 ---
 
 
@@ -35,6 +37,7 @@ library(corrplot)
 library(sjPlot)
 library(stargazer)
 library(lmerTest)
+library(texreg)
 ```
 
 ```{r}
@@ -212,12 +215,12 @@ coef(summary(fullprogramslope))
 ```{r table1,echo=FALSE, warning = FALSE, results= 'asis'}
 table1 <- sports %>% select(School, Region, "Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR, "Year" = Start.Year)
 preview <- head(table1, 5)
-stargazer(preview, type = 'html', summary = FALSE, title= "Table 1: Selected variables from the first five observations in the dataset.")
+stargazer(preview, type = 'latex', summary = FALSE, title= "Selected variables from the first five observations in the dataset.")
 ```
   
   The first dataset used is the NCAA Academic Progress Rate Database. From this the variables of interest are the schools, the state each school is in, the various sports, the individual years, and each specific program's APR score.  Each athlete on the team can receive at most 2 points, one for remaining eligible over the semester and another for staying at the institution. So, each athlete can have anywhere between zero and two points for a given semester. The APR score for each Division I team is calculated by adding all points earned by the team and dividing that total by the maximum possible number of points that could have been earned. This percentage is then multiplied by 1,000 to return the team’s APR score. Thus, an APR of 950 means that the student-athletes in the cohort earned 95 percent of the eligibility and retention points that they could have earned.  It is important to note that APR in this dataset represents a four-year rolling average of APR scores.  Figure 1 (below) shows the variation in APR scores between sports and years.  Men's Basketball, Baseball, and Football all have lower APR scores on average from the other sports (a), where Men's and Women's Ice Hockey has higher APR scores on average. We can also see that over the 8-year time period in our data (b) APR scores on average have increased.
   
-```{r figure1,fig.align="center",out.width="80%",fig.cap= 'Figure 1: Distribution and trend of Multi-Year APR scores. Plot (a) is based on all 17,700 observations from all 2,168 programs over all years separated by sport.  Plot (b) tracks the increasing trend of APR scores from the year 2010 to 2018.', echo=FALSE, warning=FALSE}
+```{r figure1,fig.align="center",out.width="80%",fig.cap= 'Distribution and trend of Multi-Year APR scores. Plot (a) is based on all 17,700 observations from all 2,168 programs over all years separated by sport.  Plot (b) tracks the increasing trend of APR scores from the year 2010 to 2018.', echo=FALSE, warning=FALSE}
 box.sport <- ggplot(data=sports,aes(factor(Sport),Multi.Year.APR)) +
   geom_boxplot() + 
   theme.1 + coord_flip() + ylab("Multi-Year APR") + 
@@ -242,7 +245,7 @@ grid.arrange(box.sport, box.sport2, ncol = 1)
 ```{r table2, echo=FALSE, out.width = "60%", warning=FALSE, results = 'asis'}
 summarydata <- sports %>% select("Percent Communication Major" = pcip09, "Total Enrollment" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost of Attendance" = costt4_a, "Average Age at Enrollment" = age_entry, Sport, "Win Percentage" = Pct, "Multi-Year APR" = Multi.Year.APR)
 
-stargazer(summarydata, type = "html", title = "Table 2: Summary Statistics", summary.stat = c("mean","sd", "min", "p25", "median", "p75", "max"), digits = 1, digits.extra = 0)
+stargazer(summarydata, type = "latex", title = "Summary Statistics", summary.stat = c("mean","sd", "min", "p25", "median", "p75", "max"), digits = 1, digits.extra = 0)
 
 ```
   
@@ -272,7 +275,7 @@ One other variable that needs to be considered is the percentage of the student 
 
   Our main purpose is to interpret how program's APR scores, measuring academic success, impact program's win percentages.  Using Ordinary Least Squares regression and multiple mixed-effects models, we can evaluate this relationship.  However, it is important to include variables in our models that impact a program's win percentage outside of APR scores.  By looking at each variable from the College Scorecard Database and its correlation with win percentage we can see if it is valuable to the models.  Figure 2 (below) explores this correlation between each variable, where a darker red shading of the box and a more negative number indicates a stronger, negative correlation and a larger positive number with a darker blue shading indicates a stronger positive correlation.  Looking at the column for win percentage in Figure 2, we can see that APR Scores, the percent white, and the total student enrollment are the most correlated with win percentage, the percent communication and percent male have very small correlation, and the average cost and average age have essentially no correlation.  With no correlation, the average cost and average age of enrollment will not be included in the models as they add no value to our results.  We will include models that include these variables, and models that do not to determine the effect these controls may have based on the differences in our results.
   
-```{r, fig.cap="Figure 2: The correlation between variables"}
+```{r figure2, fig.cap="The correlation between variables"}
 select_sports <- sports %>% select(Pct, centeredAPR, pcip09, ugds, ugds_men, ugds_white, costt4_a, age_entry) %>%
   rename('Win Percentage' = Pct, "APR" = centeredAPR, "Percent Communication; Etc." = pcip09, "Students Enrolled" = ugds, "Percent Male" = ugds_men, "Percent White" = ugds_white, "Average Cost" = costt4_a, "Average age at entry" = age_entry)
 Corr <- cor(select_if(select_sports, is.numeric), use="complete.obs")
@@ -282,7 +285,7 @@ corrplot(Corr, method= "color", type = "lower", order = "original",
 
   It is also important to explore the possibility of differences in location.  Perhaps programs in the Southwest have higher win percentages on average than programs in New England.  Figure 3 (below) demonstrates differences in win percentage for the different geographic regions.  Generally speaking, all regions have a median win percentage of roughly 50%. Without major differences between regions, they may not contribute to our final results, but we will look at our models with and without a variable controlling for the geographic region and compare the estimates.
   
-```{r figure3, fig.cap="Figure 3: The distribution of Win Percentages in different geographic locations"}
+```{r figure3, fig.cap="The distribution of Win Percentages in different geographic locations"}
 LMRegion <- ggplot(sports, aes(x = Pct, as.factor(Region))) +
   geom_boxplot(method='lm', se = FALSE) + 
   theme.1 +
@@ -317,7 +320,7 @@ $$
   
   The first random effect our mixed effects model will include is $s_i$.  This is a random effect allowing for deviation from each specific school after accounting for APR score and other fixed effects.  Compared to the OLS model which only has the single error term where everything is expected to deviate at random from the expected value, this only represents the random deviations for each school.  $s_i$ is distributed $s_i \sim N(0,\sigma_s^2)$ where $\sigma_s$ is the standard deviation of differences of each school's win percentage relative to its predicted value based on APR scores and other fixed effects.  It is also important to add a similar random effect, $p_{ij}$, that allows for deviations between programs at the same school after accounting for APR and other fixed effects.   $p_{ij}$ is distributed $p_{ij} \sim N(0,\sigma_p^2)$ where $\sigma_p$ is the standard deviation of differences of each specific program's win percentage relative to its predicted value based on APR scores and other fixed effects.  As in the OLS model, the mixed effect models still have an error term $\epsilon_{ijk}$, however now this random effect represents the unexplained variability in win percentage within a program from year-to-year.
   
-```{r figure4,fig.align="center",out.width="80%",fig.cap= 'Figure 4: Differences in slopes (a) from school to school selecting at random 10 schools, and (b) from program to program selecting all programs from 2 schools at random', echo=FALSE, warning=FALSE}
+```{r figure4,fig.align="center",out.width="80%",fig.cap= 'Differences in slopes (a) from school to school selecting at random 10 schools, and (b) from program to program selecting all programs from 2 schools at random', echo=FALSE, warning=FALSE}
 set.seed(1313)
 randschool = as.vector(sample(sports$School,size=10))
 schoolsrd <- sports %>%
@@ -376,8 +379,7 @@ did_print <- data.frame(npar=drop_in_dev$npar,
 row.names(did_print) <- row.names(drop_in_dev)
 
 kable(did_print, booktabs=T,
-      caption="Table 3: Likelihood Ratio Test using anova") %>%
-    kable_styling(latex_options = "scale_down", font_size = 16)
+      caption="Table 3: Likelihood Ratio Test using anova")
 ```
 
 Model 6.a: $Y_{ijk} = \alpha_0 +\beta_1APR_{ijk} + \beta_2Enrollment_i + \beta_3PercentWhite_i + s_i + p_{ij} + m_{ij}APR + \epsilon_{ijk}$
@@ -417,8 +419,7 @@ BIC <- BIC(`Model 6`, `Model 6.a`, `Model 6.b`) %>% select(-df)
 covariatecomp <- cbind(AIC,BIC)
 
 kable(covariatecomp, booktabs=T,
-      caption="Table 4: AIC and BIC Comparisons") %>%
-    kable_styling(latex_options = "scale_down", font_size = 16)
+      caption="Table 4: AIC and BIC Comparisons")
 ```
   
 ## Results
@@ -439,7 +440,8 @@ $$
 
 ```{r}
 results <- tab_model(`Model 6.b`, show.se = TRUE, show.ci = FALSE, show.p = FALSE, show.stat = TRUE, show.icc = FALSE, show.r2 = FALSE, show.intercept = TRUE, pred.labels = c("Intercept", "Centered APR Score", "Total Enrollment", "Percent White", "Percent Male", "Percent Communication Majors", "New England", "Mid East", "Great Lakes", "Plains", "Southeast", "Southwest", "Rocky Mountains", "Far West"), dv.labels = ("Win Percentage"), string.stat = "T Stat", string.se = "SE", digits = 3, digits.re = 5, title = "Table 5: Mixed Effects Model 6.b Results")
-results
+
+texreg(`Model 6.b`)
 ```
 
 From the model results shown in Table 5, a total 17,661 observations from 374 different schools and 2,168 different programs were used to estimate our model.  We can begin to interpret our results by looking at the fixed effects estimates.  $\alpha_0 = 38.572$ and is the mean win percentage of an athletic program with a mean APR Score of 974.4 at a U.S. service school where enrollment is 0 students, 0 percent of which are white, 0 percent of which are male, and 0 percent are communication majors.  Of course there is no school in our data where this holds, so this estimate is not a valid interpretation of any school in our dataset.  $\beta_1 = 0.104$.  This is the estimated increase in a program's win percentage for a 1 point increase in APR score after controlling for total enrollment, the percent white, the percent male, the percent communications majors, and the geographic region.  With a T-Statistic of 10.544, this is statistically significant and is the variable of interest in our research. $\beta_2 = 0.000267$ and corresponds to the estimated increase in win percentage for one more enrolled student at the school after controlling for APR score, the percent white, the percent male, the percent communications majors, and the geographic region.  A single student increase is not reasonable, so we can say that a 1,000 student increase in enrollment corresponds to 0.267 percentage point increase in win percentage.  With a T-Statistic of 7.905, this is also statistically significant. We can see $\beta_3 = 0.118$ which is the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is white after controlling for APR score, total enrollment, the percent male, the percent communications majors, and the geographic region.  The T-Statistic of 7.494 shows that this is significant. $\beta_4 = 0.011$ and is the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is male after controlling for APR score, total enrollment, the percent white, the percent communications majors, and the geographic region. The small T-Statistic of 0.263 shows this is insignificant. $\beta_5 = 0.226$.  This is the estimated increase in win percentage for a 1 percentage point increase in the percentage of the student body that is majoring in communications or a related field after controlling for APR score, total enrollment, the percent white, the percent male, and the geographic region. The T-Statistic of 3.213 is significant, but not as much as APR Score, Enrollment, or Percent White.  
