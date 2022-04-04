@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/Debian) (preloaded format=xelatex 2022.3.24)  2 APR 2022 03:43
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/Debian) (preloaded format=xelatex 2022.3.24)  4 APR 2022 16:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -921,38 +921,41 @@ File: Analysis_files/figure-latex/figure3-1.pdf Graphic file (type pdf)
 [5] [6]
 File: Analysis_files/figure-latex/figure4-1.pdf Graphic file (type pdf)
 <use Analysis_files/figure-latex/figure4-1.pdf>
-[7] [8] [9] [10] [11]
-Overfull \hbox (193.835pt too wide) in paragraph at lines 828--832
+[7] [8] [9]
+File: Results.png Graphic file (type bmp)
+<Results.png>
+[10] [11] [12] [13]
+Overfull \hbox (193.835pt too wide) in paragraph at lines 830--834
 \TU/lmr/m/n/10 lege Student Journal, vol. 44, no. 1, Mar. 2010, pp. 64–70. EBSC
 Ohost, search.ebscohost.com/login.aspx?direct=true&db=aqh&AN=48646428&site=eds-
 
  []
 
 
-Overfull \hbox (73.56497pt too wide) in paragraph at lines 860--921
+Overfull \hbox (73.56497pt too wide) in paragraph at lines 862--923
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 27.93398pt on input line 921.
+LaTeX Warning: Float too large for page by 27.93398pt on input line 923.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 923.
-[12] [13]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 923.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 925.
+[14] [15]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 925.
 (./Analysis.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 923.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 923.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 925.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 925.
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 19894 strings out of 479819
- 347711 string characters out of 5895846
- 821913 words of memory out of 5000000
- 36700 multiletter control sequences out of 15000+600000
+ 19901 strings out of 479819
+ 347793 string characters out of 5895846
+ 819913 words of memory out of 5000000
+ 36705 multiletter control sequences out of 15000+600000
  538855 words of font info for 73 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  59i,17n,115p,807b,397s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on Analysis.pdf (13 pages).
+Output written on Analysis.pdf (15 pages).
