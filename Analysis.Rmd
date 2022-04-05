@@ -1,10 +1,12 @@
 ---
 title: "The Effect of Academic Performance on Athletic Success in Collegiate Athletic Programs"
-author:   
-  - "Derek Brickley"
-  - "Faculty Advisor: Professor Andrew J. Sage"
-  - "Lawrence University"
+author: 
+  - "Derek R Brickley"
+  - 'Lawrence University'
+  - 'Faculty Advisor: Professor Andrew J. Sage'
+  - 'Faculty Advisor: Professor Jonathan Lhost'
 date: "3/16/2022"
+degree: 'Bachelor of Arts'
 header-includes:
    - \usepackage{dcolumn}
 output: 
