@@ -1,10 +1,10 @@
 ---
 title: "The Effect of Academic Performance on Athletic Success in Collegiate Athletic Programs"
 author: 
-  - "Derek R Brickley"
+  - "Derek R Brickley[^note]"
   - 'Lawrence University'
-  - 'Faculty Advisor: Professor Andrew J. Sage'
-  - 'Faculty Advisor: Professor Jonathan Lhost'
+  - 'Faculty Advisor: Professor Andrew J. Sage[^note]'
+  - 'Faculty Advisor: Professor Jonathan Lhost[^note]'
 date: "3/16/2022"
 degree: 'Bachelor of Arts'
 header-includes:
@@ -202,7 +202,9 @@ coef(summary(fullprogramslope))
 
   Since the National Collegiate Athletics Association (NCAA) was formed, student-athletes have been representing their school through athletic programs. This leads us to ask how student-athletes' academic performance impacts their teams' athletic success. Utilizing multiple mixed-effects models, we explore the relationship between academics and athletics measured using Academic Progress Rate (APR) and win percentage respectively.  In doing so we find that athletic programs with a greater percentage of athletes remaining eligible and higher rates of athlete retention have higher win percentages on average.
   
-[^note]:For more information, visit the github repository: https://github.com/drbrickley/SeniorProject.  You can also contact Derek Brickley at sticksbrick@gmail.com, Professor Sage at andrew.j.sage@lawrence.edu or Professor Lhost at jonathan.lhost@lawrence.edu.
+[^note]:https://github.com/drbrickley/SeniorProject.  Derek Brickley at sticksbrick@gmail.com
+[^note]:Professor Sage at andrew.j.sage@lawrence.edu
+[^note]:Professor Lhost at jonathan.lhost@lawrence.edu.
 
 
 \newpage
