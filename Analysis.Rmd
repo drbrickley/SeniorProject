@@ -201,6 +201,9 @@ coef(summary(fullprogramslope))
 ## Abstract
 
   Since the National Collegiate Athletics Association (NCAA) was formed, student-athletes have been representing their school through athletic programs. This leads us to ask how student-athletes' academic performance impacts their teams' athletic success. Utilizing multiple mixed-effects models, we explore the relationship between academics and athletics measured using Academic Progress Rate (APR) and win percentage respectively.  In doing so we find that athletic programs with a greater percentage of athletes remaining eligible and higher rates of athlete retention have higher win percentages on average.
+  
+[^note]:For more information, visit the github repository: https://github.com/drbrickley/SeniorProject, or contact Derek Brickley at sticksbrick@gmail.com or Professor Sage at andrew.j.sage@lawrence.edu
+
 
 \newpage
 
